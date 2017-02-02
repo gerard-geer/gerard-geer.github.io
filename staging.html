@@ -1,0 +1,55 @@
+
+					<div class='content' id='shaders'>
+						<h1>Fun with Ray-Marching</h1>
+						<p>I've always been fascinated with ray-tracing and its cousins. I've always
+						been intriqued by its reputation of elegance and simplicity, but stymied by
+						the math that most whitepapers lead off with, and the tedium of setting up a
+						project far enough as to actually be able to do some drawing.</p>
+						<p>Recently though I stumbled upon a website called Shadertoy, which provides
+						users a WebGL fragment shader with several common and useful uniform variables
+						already defined and provided. Some textures and cubemaps are provided as well!</p>
+						<p>At this point I decided in a moment of fortitude that I should go ahead and
+						learn a fair bit.</p>
+						<p>Specifically speaking I focused on ray-casting, a less analytic approach
+						to casting rays. While working with this I learned several lighting techniques,
+						such as creating distance functions, lighting, shadowing, and ambient occlusion.
+						I'll outline some of what I've learned here.</p>
+						<h2>Distance Functions and the Basis of Ray Marching</h2>
+						<p>At the root of ray-marching is something called the <i>distance function.</i>
+						It turns your geometry into a scalar field, where for any position in space
+						you can query it for the distance to the nearest point on the surface of your
+						scene.</p>
+						<p>A ray begins its life thrust through a pixel from the view origin. Once it
+						enters, the scene, however, its life is dominated by the distance function.
+						The ray is marched along its direction by the distance to the nearest object,
+						until that distance falls below a minimum. At that point, we assume that the
+						ray has arrived at a surface. The position of that ray is then interpreted as
+						the location of a surface as seen through that pixel.</p>
+						<h2>Normal Derivation</h2>
+						<p>Deriving the surface normal of a surface is moderately expensive, but very
+						straight forward. The direction a surface is facing can be understood from the
+						rate of change of that surface's position.</p>
+						<p>Therefore, if we take the difference in the position from a generally marched
+						ray and three others moved slightly along each axis, we will be left with the
+						surface normal.</p>
+						<h2>Lighting</h2>
+						<p>Now that we have the position and normal vector of a surface available to us,
+						it is possible to do some sort of per-fragment lighting. I've kept it tidy by using
+						the Blinn-Phong model.</p>
+						<p>Blinn-Phong lighting simply put is: ambient + diffuse + specular lighting = Phong Model.</p>
+						<p>The ambient term is just a constant color that is considered to exist omnipresently
+						in the scene.</p>
+						<p>The diffuse term is the color of the material multiplied with the color of the light,
+						further modulated by the cosine of the angle between the incident light vector and
+						the surface normal.</p>
+						<p>The specular highlight is a tad more complex. First we must reflect the incident view
+						vector across the surface normal to get a reflection vector. We then take the cosine
+						of the reflection vector and the incident light vector, and raise it to a specularity
+						power. This term is merely the color of the light, as it's a reflection of the light
+						itself.</p>
+						<h2>Shadows</h2>
+						<p></p>
+						<p></p>
+						<p></p>
+						<p></p>
+					</div>

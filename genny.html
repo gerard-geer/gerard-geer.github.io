@@ -1,0 +1,219 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Projects | Genesis Mods</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the content on the page. -->
+		<div class='content_container container' id='project_content_container'>
+			<!-- The actual content. -->
+			<div class='content'>
+				<h1>VA-4 Model II Sega Genesis</h1>
+				<p>During the Christmas of 1997 my grandparents bought me a model II Sega Genesis. 
+				Unlike my father's NES, this console was actually mine, and as long as I knew that 
+				it wasn't just a toy--and could electrocute me--I was free to mess about with it however I 
+				wanted. For the entire portion of my youth that I used the system afresh, I never
+				used it, even thought about it in such a way that was out of accordance with the
+				manual.</p>
+				<p>Jumping ahead to my first term at RIT, I had my Genesis and many, many games shipped
+				to my dorm. A floormate and decent friend took note and rather forcfully suggested that we
+				modify the console as to bypass the composite video encoder and output pure RGB video, greatly
+				improving video quality. And so he did, tearing apart the precious gift that was so
+				special to me over the years, soldered to it, and re-assembled it with a new hole in
+				the back and a new port. This was the first of many additions to the console.</p>
+				<p>The next modification to it was to add a 3.5mm stereo audio jack so that we wouldn't
+				need to use the original video cables for sound. So I took a female connector and
+				soldered it to the breakout of the AV port. Simple stuff.</p>
+				<p>A few months later the same floormate and I found a very large and very good CRT Television
+				abandoned in a garbage pile. The LHF/UHF tuner was broken(or something), but it still
+				displayed data just fine. So while my friend was busy modifying it to recieve pure RGB
+				input, I soldered a female S-Video port to the same AV breakout (The Sega proprietary AV port has a
+				lot of pins for a lot of things) and we were off to the races yet again.</p>
+				<p>By far the most interesting addition, however, was the bank of switches on the side.
+				After soldering switches to the 50/60Hz and PAL/NTSC jumpers, I looked about an inch
+				to the left and noticed that there were several more jumpers. And even more above.
+				I put the console back together to test the first two switches, then I took it partially
+				back apart to mess with those jumpers. I haven't the slightest idea Sega would have left
+				these on the board. One prevents the VDP from writing out to the encoder, leaving either
+				just the border color or stripes of two palette entries, and another occasionally crashes
+				the console(likely my fault). But two others seem to work together to prevent IO operations
+				to VRAM. This means that one can: 
+						<ul>
+							<li>load a game</li>
+							<li>Engage the jumpers</li>
+							<li>Swap out the cartridge</li>
+							<li>[Rapidly] reset the console</li>
+							<li>Start the other game</li>
+							<li>Disengage the jumpers</li>
+							<li>Play the current game with whatever was left in 
+							VRAM by the other game, and hasn't yet been replaced.</li>
+						</ul>
+				Down below are some photos of the console, and this very process.
+				</p>
+				
+				<h2>Photos</h2>
+				
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/genny/full/top.jpg' target='_blank'><img src='img/prj/genny/small/top.jpg' alt='Genesis Top' width='594' height='337'></a>
+					</div>
+						<div class='image_text'>
+						The top of my console. A keen eye will notice that the LED is a tad strange,
+						a less keen eye will notice that the region tabs have been gnawed off of the 
+						cartridge slot, and a not-so-keen eye will notice that the hardware stickers 
+						from my old laptop ended up on the console's backside.
+						</div>
+					</p>
+				</div>
+				
+				<div class='image_and_text'>		
+				<p>
+					<div class='image'>
+					<a href='img/prj/genny/full/backfin.jpg' target='_blank'><img src='img/prj/genny/small/backfin.jpg' alt='Genesis Back' width='594' height='337'></a>
+					</div>
+						<div class='image_text'>
+						The back of the console. From left to right one sees the 15-pin VGA connector that spits out our RGB signal, 
+						the fancy looking new audio out, the two original ports, the NTSC/PAL switch, the refresh-rate switch, and
+						the S-VIDEO port. Yes, the RGB port is the same type of connector that older graphics cards and computers have. This
+						will work with any monitor that supports the sync-frequency of the Genesis' VDP. Apparently the rate on this Genny is not
+						as stable as one would like; when one tries to get the SyncMaster(seen below) to adjust to this signal,
+						we get some strange, strange column-centric ghosting, pointing to an inconsistency in pixel phase and 
+						single pixel generation rate. On my friend's Model I Genesis, there is no such problem.
+						</div>
+					</p>
+				</div>
+				
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/genny/full/side.jpg' target='_blank'><img src='img/prj/genny/small/side.jpg' alt='Genesis Side' width='594' height='337'></a>
+					</div>
+					<div class='image_text'>
+					Here we see the DIP bank that I used to play with all the mysterious jumpers. It was torn off some old discarded PCB
+					that was laying around. Switches 9 and 10 are the magic two that do the funky with the VRAM, 8 has no effect, and 
+					7, 6, and 5 mess with VDP output. The others don't seem to do anything but on the rarest of occasions freeze
+					the system.
+					</div>
+					</p>
+				</div>
+				
+				<div class='image_and_text'>		
+					<div class='image'>
+					<a href='img/prj/genny/full/motherboardfin.jpg' target='_blank'><img src='img/prj/genny/small/motherboardfin.jpg' alt='Genesis Mobo' width='594' height='337'></a>
+					</div>
+						<div class='image_text'>
+						<p>
+						Taking the top off the Genesis we see some of the handywork done inside. In box A we see the working of my friend's
+						RGB modification: sapping from behind the composite encoder, being resisted for correct brightness, and going out to the 
+						VGA port.
+						</p>
+						<p>
+						In box B we see some of the jumpers that are accessed. These connect to switches 3 and 4. They aren't special.
+						</p>
+						<p>
+						Hiding in box C we find the majority of the jumpers. Towards the bottom of this mess are the two that affect
+						VRAM IO, and above are the other ones that affect video. These are switches 5 through 10.
+						</p>
+						<p>
+						In the next two boxes is the connection to the jumper that controls refresh rate and the region respectively.
+						</p>
+						<p>
+						Finally in box E we see the removal of the original evil red LED and its replacement: a very, very bright green LED.
+						The original 1.5 volts or so that the original LED took didn't power the new LED, so now it sits on a chunk
+						of perf board and is powered directly from the little votage regulator on the left of the motherboard, and
+						a opto-isolator connected to the original LED location switches the LED when necessary. The assembly is too tall
+						to fit under the original LED diffuser, so one made of hot glue (almost identical in translucency!) does the job instead.
+						</p>
+						<p>
+						If it isn't strong enough to use as a frisbee, it's not good enough. That's why everything is reinforced with copious
+						amounts of hot glue.
+						</p>
+						</div>
+				</div>
+				
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/genny/full/sor3far.jpg' target='_blank'><img src='img/prj/genny/small/sor3far.jpg' alt='SORIII Near' width='594' height='337'></a>
+					</div>
+						<div class='image_text'>
+						Streets of Rage III running on a SyncMaster 940Be monitor.
+						</div>
+					</p>
+				</div>
+				
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/genny/full/sor3near.jpg' target='_blank'><img src='img/prj/genny/small/sor3near.jpg' alt='SORIII Far' width='594' height='337'></a>
+					</div>
+						<div class='image_text'>
+						Close up shot for a bit more color accuracy.
+						</div>
+					</p>
+				</div>
+				
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/genny/full/garbled.jpg' target='_blank'><img src='img/prj/genny/small/garbled.jpg' alt='Garbled Mess' width='594' height='337'></a>
+					</div>
+						<div class='image_text'>
+						This is what happens when you engage the VRAM IO jumpers. It's crazy.
+						</div>
+					</p>
+				</div>
+				
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/genny/full/sksor3far.jpg' target='_blank'><img src='img/prj/genny/small/sksor3far.jpg' alt='SOR3 and S&K Combined' width='594' height='337'></a>
+					</div>
+						<div class='image_text'>
+						Here I've swapped Streets of Rage III with Sonic and Knuckles without dis-engaging 
+						the jumpers until getting in game.
+						</div>
+					</p>
+				</div>
+				
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/genny/full/sksor3near.jpg' target='_blank'><img src='img/prj/genny/small/sksor3near.jpg' alt='SOR3 and S&K Combined close-up' width='594' height='337'></a>
+					</div>
+						<div class='image_text'>
+						Close up. Notice that you can still see the font tiles of Streets III, as well as several 
+						intact background elements. The rest is garbled since S&K doesn't store its tiles in the
+						same order as SOR III, nor with the same palettes. Sonic's animations are loaded from RAM whenever needed, so
+						they aren't affected by this hack.
+						</div>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

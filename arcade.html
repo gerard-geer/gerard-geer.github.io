@@ -1,0 +1,100 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Projects | Arcade Interface</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+	<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the real content of the page. -->
+		<div class='content_container container' id='top_content_container'>
+			<div class='content'>
+				<h1>Arcade Interface</h1>
+				<p>On RIT's Computer Science House there is an arcade machine built by some bros that currently is a multi-game cabinet.
+				The prior interface to select a game was rather lackluster, so I decided to have a go at redesigning it.
+				Previously games were merely an alphabetized list of names that the user scrolled through. While effective, it didn't
+				frame the games in the cabinet in any sort of enticing light. Put simply, it wasn't very graphical.</p>
+				<p>My interface sets out to change that.</p>
+				<p>The new UI is centered around a tile-based selection mechanic. Each tile has four neighbor slots, which can point to
+				any other tile in the tile grid (or no tile, for that matter). Beyond that, the interface can store multiple grids of tiles
+				that can be easily switched between.</p>
+				<p>The tiles each store three screenshots, one to display on the tile when it is not currently highlighted, one to 
+				display when it is, and one to display in the background of the	UI when the tile is highlighted.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/arcadeui/full/gsh.png' target='_blank'><img src='img/prj/arcadeui/small/gsh.png' alt='Arcade UI Gunstar Heroes highlighted' width='298' height='238'></a>
+					<a href='img/prj/arcadeui/full/sor2.png' target='_blank'><img src='img/prj/arcadeui/small/sor2.png' alt='Arcade UI Streets of Rage 2 highlighted' width='298' height='238'></a>
+					</div>
+						<div class='image_text'>
+						Notice the different images displayed in the background and on the tiles in these two screenshots.
+						</div>
+					</p>
+				</div>
+				<p>
+				The UI works by making system() calls to the OS; each tile has a command that is executed when it is selected. This allows for maximum
+				versatility. Any program can be assigned to a tile--games running in Kega Fusion to others that are running natively on the machine can
+				be represented in the UI. They merely have to be able to be exited with the cabinet's controls.</p>
+				<p>Each tile is highly configurable. Besides their neighbor relationships, their positions, images, and sizes can be 
+				configured. Besides that, the fact that they can have frames is also user-defined. Tiles can also be specified to not be selectable.</p>
+				<p>The interface itself has many properties that can be tailored as well. The BGM track, sound effects, and their volumes are 
+				all adjustable, as are the frame sreenshot, the time taken between frames, the shutdown time, and many other parameters. You can even
+				specify your own shaders if necessary.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/arcadeui/full/uiconfig.png' target='_blank'><img src='img/prj/arcadeui/small/uiconfig.png' alt='UI Config' width='298' height='238'></a>
+					<a href='img/prj/arcadeui/full/tileconfig.png' target='_blank'><img src='img/prj/arcadeui/small/tileconfig.png' alt='Tile Config' width='298' height='238'></a>
+					</div>
+						<div class='image_text'>
+						Screens showing the properties of the tiles and editor that are user-defined.
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/arcadeui/full/editor.png' target='_blank'><img src='img/prj/arcadeui/small/editor.png' alt='Tile editor' width='600' height='480'></a>
+					</div>
+						<div class='image_text'>
+						An editor is available to create tile configurations.
+						</div>
+					</p>
+				</div>
+				<h1>Action Video</h1>
+				<div class='image_and_text'>		
+					<p>
+					<div class='video'>
+					<iframe width='480' height='360' src='https://www.youtube.com/embed/6NWu2vIvqNU' frameborder='0' allowfullscreen></iframe>
+					</div>
+						<div class='image_text'>
+						A short video captured in Fraps that shows the general operation of the UI. Note that grids are switched between, but as a lazy oversight,
+						they all contain the same games.
+						</div>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Articles |  Fast Surface Normal Derivation</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+	<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the real content of the page. -->
+		<div class='content_container container' id='top_content_container'>
+			<div class='content'>
+				<h1>Fast Surface Normal Generation</h1>
+				<p>When one draws computer graphics the traditional way, using all of the rendering
+				pipeline, it's easy to include surface orientation data right alongside other vertex
+				data.</p>
+				<p>However when ray-marching one calculates geometry on the fly, and hence can't be
+				buddied-up with pre-computed surface normals. How then does one calculate a surface normal?</p>
+				<p>After a while I thought to take the negative reciprocal of the local derivative (essentially
+				a Sobel filtering) to create a vector that pointed out of the surface, and hence could
+				be the surface normal. However, that takes a ton of sampling and division, both very
+				time-heavy operations. Then I stumbled upon this gem.</p>
+				<div class='code_snippet'>
+					<p>
+					/*<br>
+					&nbsp;&nbsp;Returns the surface normal of a point in the distance function.<br>
+					*/<br>
+					vec3 getNormal(vec3 pos)<br>
+					{<br>
+					&nbsp;&nbsp;float d=getDist(pos);<br>
+					&nbsp;&nbsp;return normalize(vec3( getDist(pos+vec3(EPSILON,0,0))-d, getDist(pos+vec3(0,EPSILON,0))-d, getDist(pos+vec3(0,0,EPSILON))-d ));<br>
+					}<br>
+					</p>
+				</div>
+				<p>Whoa, what is this mess? Let's refactor it for readability.</p>
+				<div class='code_snippet'>
+					<p>
+					/*<br>
+					&nbsp;&nbsp;Returns the surface normal of a point in the distance function.<br>
+					*/<br>
+					vec3 getNormal(vec3 pos)<br>
+					{<br>
+					&nbsp;&nbsp;float c=getDist(pos);<br>
+					&nbsp;&nbsp;vec3 n = vec3();<br>
+					&nbsp;&nbsp;n.x = getDist( pos+vec3(EPSILON,0,0) );<br>
+					&nbsp;&nbsp;n.y = getDist( pos+vec3(0,EPSILON,0) );<br>
+					&nbsp;&nbsp;n.z = getDist( pos+vec3(0,0,EPSILON) );<br>
+					&nbsp;&nbsp;n - c;<br>
+					&nbsp;&nbsp;return normalize(n);<br>
+					}<br>
+					</p>
+				</div>
+				<p>That's more expensive, but fathoms more pleasant to read. First, some clarification.
+				This function relies on some predefined tokens. EPSILON is the maximum acceptable distance
+				threshold, and getDist() is the distance function. Normalize() is a built-in to normalize
+				a vector type.
+				To understand what's going on here, let's step down into two dimensions and draw pictures. 
+				Here's a point that we've marched to the surface of a distance function.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/normals/full/marchedpoint.png' target='_blank'>
+						<img src='img/prj/normals/small/marchedpoint.png'alt='marched point' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						The red dot is a point marched to the surface of a distance function.
+						</div>
+					</p>
+				</div>
+				<p>Now remember that point does not exist
+				exactly upon the surface, but rather has been marched to within a minimum distance (that we 
+				call epsilon) of the distance function. So if we zoom in by a great amount...</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/normals/full/zoomedpoint.png' target='_blank'>
+						<img src='img/prj/normals/small/zoomedpoint.png'alt='zoomed on point' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						A close up of the prior figure.
+						</div>
+					</p>
+				</div>
+				<p>There are two important things to notice about this figure. First is the afore mentioned
+				discontinuity in marched position versus actual position, and second, that at this scale
+				nearly all surfaces approach linear gradients.</p>
+				<p>If we look at the function, we see that it samples the distance function epsilon away
+				from the original point along the positive direction of each axis. Let's do that in our
+				2D illustration--first we do this along the X axis.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/normals/full/sampledatx.png' target='_blank'>
+						<img src='img/prj/normals/small/sampledatx.png'alt='sampling along the x axis' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Sampling the distance function epsilon along the X axis. The new distance is represented
+						by the purple line, with the original distance typified by the blue line, with the
+						dotted green line being epsilon distance along the X axis.
+						</div>
+					</p>
+				</div>
+				<p>Next we need to subtract the original distance from the value along the X axis. This will give
+				us the magnitude of our normal vector in the X direction.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/normals/full/subtractedx.png' target='_blank'>
+						<img src='img/prj/normals/small/subtractedx.png'alt='subtracting original dist' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Subtracting the original distance from the freshly sampled distance. The subtracted portion
+						is now dotted.
+						</div>
+					</p>
+				</div>
+				<p>The next step is to sample the distance function epsilon along the Y axis away
+				from the original point.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/normals/full/sampledaty.png' target='_blank'>
+						<img src='img/prj/normals/small/sampledaty.png'alt='sampling along the y axis' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Sampling the distance function epsilon along the Y axis. This value is represented
+						by the yellow line, with the translation epsilon along the Y axis drawn out in 
+						dotted green.
+						</div>
+					</p>
+				</div>
+				<p>Again we subtract epsilon from this sampled distance, and this time we
+				arrive at the magnitude of the Y component of our normal vector.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/normals/full/subtractedy.png' target='_blank'>
+						<img src='img/prj/normals/small/subtractedy.png'alt='subtracting original dist' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Subtracting the original distance. The dotted portion of the yellow line is
+						the result of our work.
+						</div>
+					</p>
+				</div>
+				<p>Now if we were to construct a vector using these terms, this is what we would arrive at.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/normals/full/normalconstructed.png' target='_blank'>
+						<img src='img/prj/normals/small/normalconstructed.png'alt='constructin perpendicular vector' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Constructing a perpendicular vector, using the remaining portions of the distance
+						values.
+						</div>
+					</p>
+				</div>
+				<p>It's important to note that this vector is merely perpendicular to the surface.
+				It still needs to be normalized to be considered a normal vector.</p>
+				<p>For those who like this kind of thing, here's a pretty LaTeX representation.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/normals/full/eqnotation.png' target='_blank'>
+						<img src='img/prj/normals/small/eqnotation.png'alt='interpolation function' width='600'>
+					</a>
+					<a href='img/prj/normals/full/normalization.png' target='_blank'>
+						<img src='img/prj/normals/small/normalization.png'alt='interpolation function' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Where <i>S</i> is the perpendicular vector, <i>d</i> is the distance function,
+						epsilon is the sampling distance, <i>p</i> is the original point, and <i>N</i>
+						is the surface normal.
+						</div>
+					</p>
+				</div>
+				<p>An interesting facet of this technique is the fact that we sample distances
+				to surface points that are not that of the original. This requires that the region
+				being sampled has negligible change in gradient for accurate results. Therefore,
+				if epsilon were large enough to span a significant change in slope, the results
+				of this technique would be garbled.</p>
+				<p>Epsilon, or the maximum acceptable distance, is always linked to the
+				accuracy of spacial representation. This technique then, with its above downfall,
+				additionally ties epsilon's precision with the accuracy of scene lighting and
+				any other effect that relies upon accurate surface orientation.</p>
+				<p>Something else to think about: What if the original distance was 0.0, and our 
+				original point actually did exist upon the geometry? What if the gradient between
+				sample positions was guaranteed to be linear, or at least guaranteed to be safe
+				to assume so? What if we were using traditional rendering techniques, and were
+				working with real fragments with access to dfdx() and dfdy()? What if?</p>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

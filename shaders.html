@@ -1,0 +1,344 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Blagoblag | Shaders</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+	<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the real content of the page. -->
+		<div class='content_container container' id='top_content_container'>
+			<div class='content'>
+				<h1>(Fragment) Shaders</h1>
+				<p>
+					Here you'll find links to several fragment shaders I've written. Click an
+                    image to run one in full screen, or the source link to view on Shadertoy with source.
+                    Note: these are all tested working on a GTX660 with a first-gen i3 CPU, but some tax it
+                    to the limit. Others run just fine on a Lenovo x200. Click with care.
+				</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/4d3GRX?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/roundrockisland.jpg' alt='Round Rock Island' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						An island with a rock. The first raymarcher of mine to feature independent shading models
+                        per material. I'm really glad with how the sand and water turned out.
+                        <a href='https://www.shadertoy.com/view/4d3GRX?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/ls2GDw?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/snowywoods.jpg' alt='Snowy Woods' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						This was my very first raymarched shader. It's not very efficient...
+                        <a href='https://www.shadertoy.com/view/ls2GDw?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/Xt2GRG?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/parkinggarage.jpg' alt='Parking Garage' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+                        The big thing I learned from this one was how to ID each object in the distance function
+                        so I could texture them independently.
+                        <a href='https://www.shadertoy.com/view/Xt2GRG?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/lst3DB?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/gimmickshoreline.jpg' alt='Gimmick Shoreline' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						All art in this one is stored within the shader source as calls to a function that serves
+                        as a binary search of its parameters.
+                        <a href='https://www.shadertoy.com/view/lst3DB?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/XtBGDR?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/beziercam.jpg' alt='Bezier Camera' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						This is the camera system I used in Parking Garage, The Skies Are Boxes, and Round Rock Island.
+                        It's just Bezier curves.
+                        <a href='https://www.shadertoy.com/view/XtBGDR?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+                        <a href='camera.html'>[camera article]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/4ljSDm?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/theskiesareboxes.jpg' alt='The Skies Are Boxes' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						One day I found that I really wanted to make something with floating cubes. This uses a 
+                        bespoke global illumination system that works because everything is either
+                        one voxel away, or not close at all.
+                        <a href='https://www.shadertoy.com/view/4ljSDm?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+                        <a href='gi.html'>[gi article]</a>
+                        <a href='ao.html'>[ao article]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/view/Mdd3R4?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/testingbeach.jpg' alt='Beach Test' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						This was the original direction I was going with what eventually became Round Rock Island.
+                        I just didn't like how the beach was very, very, linear.
+                        <a href='https://www.shadertoy.com/view/Mdd3R4?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/4t23Dy?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/balls.jpg' alt='Metaballs' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						A rough-hewn metaball shader.
+                        <a href='https://www.shadertoy.com/view/4t23Dy?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/XljXWd?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/basicraytracer.jpg' alt='Basic Raytracer' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						I went to the dark side one day, and learned a lot about ray-tracing (not -marching).
+                        <a href='https://www.shadertoy.com/view/XljXWd?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/4dtGD2?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/bitmaptext.png' alt='Bitmap Text' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						Bitmap text! Encoded in GLSL floats!
+                        <a href='https://www.shadertoy.com/view/4dtGD2?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+                        <a href='bittext.html'>[bitmap text article]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/4st3WS?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/bufferstorage.jpg' alt='Buffer as memory' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						Shadertoy recently implemented a multi-framebuffer system, where each framebuffer
+                        isn't glClear()'d each frame. That means one can store stuff in 'em between frames!
+                        The source is definitely the cool part to this shader.
+                        <a href='https://www.shadertoy.com/view/4st3WS?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+                    <a href='https://www.shadertoy.com/embed/4dcGD2?gui=true&t=0&paused=false'
+                    target='_blank'>
+                        <img src='img/shaders/preview/projectile.jpg' alt='Projectiles' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						A simple application of being able to store stuff in framebuffers. WASD to aim, space to fire.
+                        <a href='https://www.shadertoy.com/view/4dcGD2' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/ls33WB?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/wasdwalkaround.jpg' alt='WASD Walkaround using buffers for state storage' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						Another application of storing state in framebuffers. WASD to move, mouse to look around.
+                        <a href='https://www.shadertoy.com/view/ls33WB?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/ls33WB?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/surfacedisplacement.jpg' alt='Raymarched Displaced Surfaces' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						What if you modulated the distance function along its surface normal based on a noise function?
+                        <a href='https://www.shadertoy.com/view/ls33WB?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/4tSXR1?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/randomdots.jpg' alt='Randomly Placed Dots' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						Floor() is an excellent function. It gives you cohesive values within a region to feed a random function.
+                        Here's an illustration.
+                        <a href='https://www.shadertoy.com/view/4tSXR1?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/lstGz8?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/fence.jpg' alt='Fence' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						The beach was going to be far more ambitious, with a fence!
+                        <a href='https://www.shadertoy.com/view/lstGz8?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/Ms33RN?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/testingbench.jpg' alt='Bench' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						The beach was also going to have a bench too. 
+                        <a href='https://www.shadertoy.com/view/Ms33RN?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/lt23Wy?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/glasscsh.jpg' alt='Glass CSH logo' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						I'm an alumni of Computer Science House at RIT. I made this while I was there to
+                        get a handle on fixed step marching and transparent objects in raymarching.
+                        <a href='https://www.shadertoy.com/embed/lt23Wy?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='https://www.shadertoy.com/embed/ltSSDw?gui=true&t=0&paused=false' 
+                    target='_blank'>
+                        <img src='img/shaders/preview/wuline.jpg' alt='Wu Antialiased lines' width='600'>
+                    </a>
+					</div>
+						<div class='image_text'>
+						I grew bored in linear algebra one day and made a per-pixel implementation of
+                        Wu's Antialiased line algorithm.
+                        <a href='https://www.shadertoy.com/view/ltSSDw?gui=true&t=0&paused=false' 
+                        target='_blank'>[with source]</a>
+						</div>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

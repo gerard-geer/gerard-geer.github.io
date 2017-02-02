@@ -1,0 +1,205 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Articles | Bitmap Fonts</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+	<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the real content of the page. -->
+		<div class='content_container container' id='top_content_container'>
+			<div class='content'>
+				<h1> Procedural Bitmap Font Rendering (in a shader)</h1>
+                <div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/bittext/full/screenshot.png' target='_blank'>
+						<img src='img/prj/bittext/small/screenshot.png' alt='Screenshot' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Some bitmap text using this technique.
+						</div>
+					</p>
+				</div>
+                <h2> Constructing and Sampling Glyphs </h2>
+                <p>One of the things that I've always wanted when I've been writing shaders on 
+                 <a href='http://shadertoy.com/user/hamneggs'>Shadertoy</a> is text. Apparently I'm
+                 not alone in this, too. Many other people have written shaders to produce text entirely
+                 within a fragment shader. Perhaps the best example is <a href='https://www.shadertoy.com/view/4sf3RN'>
+                 this shader</a> by P_Malin.</p> Here he does text two ways: first, by XORing rectangles together
+                 to make the characters, and second, encoding 1bpp pixels in floats. The second way is way cooler;
+                 cool enough for me to learn it, make some branch-elimating changes, and write about it here.
+                <p>The most important thing to know about this technique is that each glyph is encoded into a float.
+                Let's look at how this is done:</p>
+                <div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/bittext/full/bitlayout.png' target='_blank'><img src='img/prj/bittext/small/bitlayout.png' alt='Character encoding chart' width='600' height='310'></a>
+					</div>
+						<div class='image_text'>
+						How each character is encoded.
+						</div>
+					</p>
+				</div>
+                <p>Right up there is a glyph I threw together for the letter 'Y'. Note how it's four pixels wide. (It's
+                 also five pixels tall, but that's less important.) This is to allow each row to be stored as a single
+                 hexadecimal digit. Then to store the character as a float, you simply have to construct the float with
+                 hexidecimal notation, with each digit being a row in the character. The reason we use floats here instead
+                 of integers is so that we don't have to typecast every time we want to do some floating point math with
+                 these ints.</p>
+                <p>Now that we've packed these characters, let's discuss how to unpack them to the screen. Not only that,
+                we want to be able to position and resize them.</p>
+                <p>Generally speaking, we first test to see if the current fragment coordinate is within the character,
+                then we return the value of the bit it lies on. In more detail (since the resizing and positioning adds
+                some complexity):
+                <ul>
+                <li>Translate the position of the glyph to the origin.</li>
+                <li>Scale the fragment coordinate by the size of the glyph, so the dimensions of the glyph become 1x1.</li>
+                <li>Do a bounding box check (which is super-simplified, since the box is from (0,0) to (1,1).)</li>
+                <li>If the coordinate is within the glyph we multiply it by the bitmap size--in this example(4,5)</li>
+                <li>Now by floor()ing the fragment coordinate we have an integer index into the bitmap.</li>
+                <li>Sample the bitmap at this coordinate and return the value.</li>
+                </ul></p>
+                <p>Let's look at this algorithm in GLSL:</p>
+                <div class='code_snippet'>
+                /*<br>
+                &nbsp;&nbsp;Draws a character, given its encoded value, a position, size and<br>
+                &nbsp;&nbsp;current [0..1] uv coordinate.<br>
+                */<br>
+                float drawChar( in float char, in vec2 pos, in vec2 size, in vec2 uv )<br>
+                {<br>
+                &nbsp;&nbsp;// Subtract our position from the current uv so that we can<br>
+                &nbsp;&nbsp;// know if we're inside the bounding box or not.<br>
+                &nbsp;&nbsp;uv-=pos;<br>
+                &nbsp;&nbsp;<br>
+                &nbsp;&nbsp;// Divide the screen space by the size, so our bounding box is 1x1.<br>
+                &nbsp;&nbsp;uv /= size;  <br>
+                &nbsp;&nbsp;<br>
+                &nbsp;&nbsp;// Bounding box check.<br>
+                &nbsp;&nbsp;if( min(uv.x,uv.y) &lt; 0.0 &amp;&amp; max(uv.x,uv.y) &gt; 1.0 ) return 0.0;<br>
+                &nbsp;&nbsp;<br>
+                &nbsp;&nbsp;// Go ahead and multiply the UV by the bitmap size so we can work in<br>
+                &nbsp;&nbsp;// bitmap space coordinates.<br>
+                &nbsp;&nbsp;uv *= MAP_SIZE;<br>
+                &nbsp;&nbsp;<br>
+                &nbsp;&nbsp;// Get the appropriate bit and return it.<br>
+                &nbsp;&nbsp;return getBit( char, 4.0*floor(uv.y) + floor(uv.x) );<br>
+                }<br>
+                </div>
+                <p>See? It's pretty straightforward. But this code breaks two gentleman's agreements from the world
+                of GLSL. First is that divide, but there's not much we can do about that within the scope of this
+                function, so it gets to stay.  But the second is the branch in the bounding box check.</p>
+                <p>Sure, with GPGPUs and MIMD architectures becoming ever so commonplace, this isn't too big of
+                a deal anymore. But nevertheless, in a fragment shader branching creates operational overhead
+                like nowhere else. So let's remove it!</p>
+                <div class='code_snippet'>
+                /*<br>
+                &nbsp;&nbsp;Draws a character, given its encoded value, a position, size and<br>
+                &nbsp;&nbsp;current [0..1] uv coordinate.<br>
+                */<br>
+                float drawChar( in float char, in vec2 pos, in vec2 size, in vec2 uv )<br>
+                {<br>
+                &nbsp;&nbsp;// Subtract our position from the current uv so that we can<br>
+                &nbsp;&nbsp;// know if we're inside the bounding box or not.<br>
+                &nbsp;&nbsp;uv-=pos;<br>
+                &nbsp;&nbsp;<br>
+                &nbsp;&nbsp;// Divide the screen space by the size, so our bounding box is 1x1.<br>
+                &nbsp;&nbsp;uv /= size;   <br> 
+                &nbsp;&nbsp;<br>
+                &nbsp;&nbsp;// Create a place to store the result.<br>
+                &nbsp;&nbsp;float res;<br>
+                &nbsp;&nbsp;<br>
+                &nbsp;&nbsp;// Branchless bounding box check.<br>
+                &nbsp;&nbsp;res = step(0.0,min(uv.x,uv.y)) - step(1.0,max(uv.x,uv.y));<br>
+                &nbsp;&nbsp;<br>
+                &nbsp;&nbsp;// Go ahead and multiply the UV by the bitmap size so we can work in<br>
+                &nbsp;&nbsp;// bitmap space coordinates.<br>
+                &nbsp;&nbsp;uv *= MAP_SIZE;<br>
+                &nbsp;&nbsp;<br>
+                &nbsp;&nbsp;// Get the appropriate bit and return it.<br>
+                &nbsp;&nbsp;res *= getBit( char, 4.0*floor(uv.y) + floor(uv.x) );<br>
+                &nbsp;&nbsp;return clamp(res,0.0,1.0);
+                }
+                </div>
+                <p>The step(min())-step(max()) subtraction will always be zero or less when the UV is outside of
+                the glyph, and one when within. Therefore we can just get the bit (overflow errata will be computed,
+                but never acted upon) and multiply it by the result of the step comparison value. All values outside
+                the bounds of the glyph will be clamped to zero, no branching required.</p>
+                <h2>Converting Values to Characters</h2>
+                <p>So now that we know how to draw glyphs, what if we wanted to display numbers programmatically?
+                What we need is a valToChar() function. Now the first idea you may have for doing this is:</p>
+                <div class='code_snippet'>
+                /*
+                &nbsp;&nbsp;Trades a float for a character bitmap.
+                */
+                float floatToChar( in float x )
+                {
+                &nbsp;&nbsp;if(x &lt; .5) return CHAR_0;
+                &nbsp;&nbsp;else if(x &lt; 1.5) return CHAR_1;
+                &nbsp;&nbsp;else if(x &lt; 2.5) return CHAR_2;
+                &nbsp;&nbsp;else if(x &lt; 3.5) return CHAR_3;
+                &nbsp;&nbsp;else if(x &lt; 4.5) return CHAR_4;
+                &nbsp;&nbsp;else if(x &lt; 5.5) return CHAR_5;
+                &nbsp;&nbsp;else if(x &lt; 6.5) return CHAR_6;
+                &nbsp;&nbsp;else if(x &lt; 7.5) return CHAR_7;
+                &nbsp;&nbsp;else if(x &lt; 8.5) return CHAR_8;
+                &nbsp;&nbsp;else if(x &lt; 9.5) return CHAR_9;
+                &nbsp;&nbsp;else return CHAR_BLNK;
+                }
+                </div>
+                <p>Now we've already talked about this: branching is bad. So let's fix it.</p>
+                <div class='code_snippet'>
+                /*
+                &nbsp;&nbsp;Trades a float for a character bitmap. Here's to eliminating
+                &nbsp;&nbsp;branches with step()!
+                */
+                float floatToChar( in float x )
+                {
+                &nbsp;&nbsp;float res = CHAR_BLNK;
+                &nbsp;&nbsp;res += (step(-.5,x)-step(0.5,x))*CHAR_0;
+                &nbsp;&nbsp;res += (step(0.5,x)-step(1.5,x))*CHAR_1;
+                &nbsp;&nbsp;res += (step(1.5,x)-step(2.5,x))*CHAR_2;
+                &nbsp;&nbsp;res += (step(2.5,x)-step(3.5,x))*CHAR_3;
+                &nbsp;&nbsp;res += (step(3.5,x)-step(4.5,x))*CHAR_4;
+                &nbsp;&nbsp;res += (step(4.5,x)-step(5.5,x))*CHAR_5;
+                &nbsp;&nbsp;res += (step(5.5,x)-step(6.5,x))*CHAR_6;
+                &nbsp;&nbsp;res += (step(6.5,x)-step(7.5,x))*CHAR_7;
+                &nbsp;&nbsp;res += (step(7.5,x)-step(8.5,x))*CHAR_8;
+                &nbsp;&nbsp;res += (step(8.5,x)-step(9.5,x))*CHAR_9;
+                &nbsp;&nbsp;return res;
+                }
+                </div>
+                <p>Now this is a bit wonky looking at first, but it uses the same approach as before. Each step
+                comparison will only return 1 if the value is between the edges of the two steps. So as we
+                accumulate each comparison, we will end up only with the character we want.</p>
+                <p><a href='https://www.shadertoy.com/view/4dtGD2'>Here's the shader live.</a></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

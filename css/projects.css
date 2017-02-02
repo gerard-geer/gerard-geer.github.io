@@ -1,0 +1,44 @@
+#projects
+{
+	text-align: center;
+	float: center;
+}
+
+.project
+{
+	margin: 4px;
+}
+
+.image_text 
+{
+	font-size: .8em;
+	
+	padding: 10px;
+}
+
+.image_and_text
+{
+	border-left-style: ridge;
+	border-right-style: ridge;
+	border-color: #ffffff;
+	border-radius: 8px;
+	-moz-border-radius: 18px;
+}
+
+.image
+{
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.code_snippet
+{
+	font-family: "Lucidia Console", monospace;
+	font-size: .8em;
+	color: #000000;
+	background-color: #ccccff; 
+	padding: 4px 8px 4px 8px;
+	border-radius: 8px;
+	-moz-border-radius: 18px;
+}

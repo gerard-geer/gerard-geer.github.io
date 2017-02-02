@@ -1,0 +1,232 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Articles | Ambient Occlusion</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+	<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the real content of the page. -->
+		<div class='content_container container' id='top_content_container'>
+			<div class='content'>
+				<h1>Normally Sampled Ambient Occlusion</h1>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/occlusion/full/screen.png' target='_blank'>
+						<img src='img/prj/occlusion/small/screen.png' alt='Screenshot' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						This technique in action in a ray-marched scene. The effect produced is most
+						noticeable in the shadows on the inside of the figure.On my x200 with 
+						integrated graphics	this runs at 18 fps at 512x312.
+						</div>
+					</p>
+				</div>
+				<h2>The Algorithm</h2>
+				<p>I first learned this technique from a presentation by Inigo Quilez (though
+				that original presentation is nowhere to be found, it seems.) It works by comparing
+				the nearest distance to the surface at points along the surface normal with the 
+				point's length along the normal, and using those values as contributions to a
+				sum of how much light was occluded. Let's take a peek, shall we?</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/occlusion/full/base.png' target='_blank'>
+						<img src='img/prj/occlusion/small/base.png' alt='Root equation' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Where <i>L</i> is the amount of occluded light, <i>s</i> is the number of
+						occlusion samples, <i>d</i> is the distance function, <i>p</i> is the surface
+						point, and <i>n</i> is the surface normal.
+						</div>
+					</p>
+				</div>
+				<p>This is a mean looking equation, so let's break it down. The first thing to note
+				is that the negative exponential out front is to scale samples' contributions to
+				the result by their distance from the surface (or rather their relevance). The
+				subtraction is the comparison between normal distance and sampled distance.</p>
+				<p>The furthest a point can be from a surface in this situation is its length along the surface
+				normal beneath it. This is important; if the nearest distance is less than
+				this normal distance, then some feature besides the origin surface is near the
+				point. If we assume that this surface is any form opaque, then it is occluding light. This
+				behavior is modelled by the distance function comparison. </p>
+				<p>However, the greater the length along the surface normal, the greater gap for
+				light to enter. Therefore the contribution of outer samples should be attenuated
+				to suit. The negative power facilitates this.</p>
+				<h2>Illustration</h2>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/occlusion/full/justNormal.png' target='_blank'>
+						<img src='img/prj/occlusion/small/justNormal.png' alt='Scene only with normal' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						A distance-field terrain with a red sample point and blue normal vector.
+						</div>
+					</p>
+				</div>
+				<p>Here we see a basic ray-marched surface with a sample point and normal vector.
+				Next we visualize several discrete steps along this vector.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/occlusion/full/dividedNormal.png' target='_blank'>
+						<img src='img/prj/occlusion/small/dividedNormal.png' alt='Divided normal vector' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						The surface normal is now divided.
+						</div>
+					</p>
+				</div>
+				<p>Now that it's established that we discretely step along the normal vector, let's
+				examine exactly why. The figure below highlights the distance along the normal
+				of each surface point.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/occlusion/full/normalIncrements.png' target='_blank'>
+						<img src='img/prj/occlusion/small/normalIncrements.png' alt='normal lengths' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						The surface normal is now divided.
+						</div>
+					</p>
+				</div>
+				<p>This next figure illustrates the algorithm's depth query.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/occlusion/full/depthSamples.png' target='_blank'>
+						<img src='img/prj/occlusion/small/depthSamples.png' alt='depth queries' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Depth queries.
+						</div>
+					</p>
+				</div>
+				<h2>Optimization</h2>
+				<p>This technique, as written in the equation above, works well. But there's room
+				to do it much faster. Let's take out a few operations.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/occlusion/full/removeZero.png' target='_blank'>
+						<img src='img/prj/occlusion/small/removeZero.png' alt='First iter delete' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Removing the first iteration.
+						</div>
+					</p>
+				</div>
+				<p>At the first iteration <i>(i=0)</i> the distance along the normal is zero, and
+				the distance to the nearest surface from the original marched point idealistically
+				is also 0. This means that the first contribution is always 0-0, and can be removed.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/occlusion/full/removeDivide.png' target='_blank'>
+						<img src='img/prj/occlusion/small/removeDivide.png' alt='Removing I/S divides' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Removing <i>i/s</i>
+						</div>
+					</p>
+				</div>
+				<p>Traditionally the surface normal is of length 1. This assumption is used here, and
+				the length along the normal is considered simply to be the iteration <i>i</i> over
+				the total number of iterations. However, that's a divide for a value that will always
+				range from just above 0 to 1. That means we can pull out those divides and simply
+				update our maximum value and iteration step.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/occlusion/full/negativePow.png' target='_blank'>
+						<img src='img/prj/occlusion/small/negativePow.png' alt='Removing scaling divide' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Removing the scaling divide.
+						</div>
+					</p>
+				</div>
+				<p>This step is rather obvious. To remove the division in the scale exponential,
+				we negate the power.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/occlusion/full/pullOutNegation.png' target='_blank'>
+						<img src='img/prj/occlusion/small/pullOutNegation.png' alt='Removing power negation' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Removing the power negation.
+						</div>
+					</p>
+				</div>
+				<p>As a final touch, we consider <i>s</i> now to be a negative number,
+				and reverse our units, so we don't perform a negation in the scale factor.</p>
+				<h2>Implementation</h2>
+				<div class='code_snippet'>
+					<p>
+					/*<br>
+					&nbsp;&nbsp;Calculates the ambient occlusion factor at a given point in space.<br>
+					&nbsp;&nbsp;Uses IQ's marched normal distance comparison technique.<br>
+					*/<br>
+					float calcOcclusion(vec3 pos, vec3 norm)<br>
+					{<br>
+					&nbsp;&nbsp;float result = 1.0;<br>
+					&nbsp;&nbsp;float s = -OCC_SAMPLES;<br>
+					&nbsp;&nbsp;const float unit = 1.0/OCC_SAMPLES;<br>
+					&nbsp;&nbsp;for(float i = unit; i < 1.0; i+=unit)<br>
+					&nbsp;&nbsp;{<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;result -= pow(2.0,i*s)*(i-getDist(pos+i*norm));<br>
+					&nbsp;&nbsp;}<br>
+					&nbsp;&nbsp;return result*OCC_FACTOR;<br>
+					}<br>
+					</p>
+				</div>
+				<p>In implementating this function I found several changes I could make to
+				simplify its contribution to the entire lighting equation.</p>
+				<p>First, if I subtract each contribution down from 1.0 I can use the resultant
+				value to scale the lighting result, simplifying later stages of my process.</p>
+				<p>Another implementation difference is that I create a local variable for 
+				<i>s</i>. This way I can still specify a positive sample amount, and also no
+				longer need to worry about zany incrementation.</p>
+				<p>Another facet that differs in the implementation is a final scale factor.
+				This factor was present in the original implementation, but I left it out of
+				my equations to avoid muddling the idea. This is used to scale the appearance
+				of the effect based on how much omni-directional light is in the scene.</p>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

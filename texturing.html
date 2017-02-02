@@ -1,0 +1,106 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<meta name='viewport' content='width=700'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Articles | 3D Texturing</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+	<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the real content of the page. -->
+		<div class='content_container container' id='top_content_container'>
+			<div class='content'>
+				<h1>Texture sampling</h1>
+				<p>Let's say you have a fragment of geometry in 3D space, with no implicit
+				surface normal or texture coordination, such as one would expect in ray-marching.
+				How does one texture this element in a manner that allows for the texture image
+				to flow over curved geometry? The answer lies in realizing that 3D surfaces exist
+				in any combination of three 2D planes: xy, xz, and yz. Allow me to explain.</p>
+				<p>First we need to translate our fragment to be of origin from the center of its
+				parent marched primitive, to prevent inconsistencies in primitive positioning.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/texturing/full/trans.png' target='_blank'><img src='img/prj/texturing/small/trans.png' alt='Translating the texel' width='600'></a>
+					</div>
+						<div class='image_text'>
+						Where <i>P</i> is either the position of the fragment or the position 
+						of the primitive.
+						</div>
+					</p>
+				</div>
+				<p>This leaves us with a 3D texture coordinate. But wait, we need to use ~2 of
+				them to determine where to sample our texture at! How do we decide which ones to
+				use?</p>
+				<p>To do this we use the surface normal. The <a href='normals.html'>surface normal</a> encodes
+				in which combination of 2D planes the fragment exists in. Allow me to illustrate:</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/texturing/full/axes.png' target='_blank'><img src='img/prj/texturing/small/axes.png' alt='Axes illustration' width='600'></a>
+					</div>
+						<div class='image_text'>
+						In this image the X axis is red, the Z axis is green, and Y is blue. Just
+						as if it came from Sketchup.
+						</div>
+					</p>
+				</div>
+				<p>Looking at this diagram it's easy to recognize that if a fragment's normal is entirely
+				in the X direction, its surface exists in the YZ plane, and likewise for the other
+				two axes.</p>
+				<p>Now that we've seen how a 3D surface exists (as said before) in any combination of
+				the XY, XZ, and YZ planes, it's important that to note that we now sample the 2D
+				texture three times for each fragment--once for each plane--and interpolate them based on
+				the surface's presence in each of the planes. This more than triples the time complexity
+				of texturing operations.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/texturing/full/lerp.png' target='_blank'><img src='img/prj/texturing/small/lerp.png'alt='interpolation function' width='600'></a>
+					</div>
+						<div class='image_text'>
+						Where <i>C</i> is the final color of the fragment, <i>tex</i> is the texture 
+						sampling function, <i>P</i> is the normalized fragment position, and <i>N</i>
+						is the surface normal.
+						</div>
+					</p>
+				</div>
+				<p>Example code for this technique would look something like this (in GLSL):</p>
+				<div class='code_snippet'>
+					<p>
+					/* <br>
+					&nbsp;&nbsp;Takes a 3D coordinate, and returns a texel based on which plane(s)<br>
+					&nbsp;&nbsp;it lies in.<br>
+					*/<br>
+					vec3 tex3D( in vec3 pos, in vec3 normal, in sampler2D sampler )<br>
+					{<br>
+					&nbsp;&nbsp;return 	texture2D( sampler, pos.yz ).rgb*abs(normal.x)+ <br>
+					&nbsp;&nbsp;&nbsp;&nbsp;texture2D( sampler, pos.xz ).rgb*abs(normal.y)+ <br>
+					&nbsp;&nbsp;&nbsp;&nbsp;texture2D( sampler, pos.xy ).rgb*abs(normal.z);<br>
+					}<br>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

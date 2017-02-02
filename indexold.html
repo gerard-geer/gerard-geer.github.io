@@ -1,0 +1,486 @@
+<html>
+<head>
+	<link rel="stylesheet" media="(max-width: 400px)" type="text/css" href="css/mobile.css">
+	<link rel="stylesheet" media="(min-width: 401px)" type="text/css" href="css/index.css">
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+	<script type="text/javascript" src="js/navbar.js"></script>
+	<title>Gerard's Webs</title>
+	<meta name="viewport" content="width=700">
+</head>
+
+<body onload='init()'>
+	<div id='vertical_centerer'></div>
+	<div id='horizontal_centerer'>
+		<div class='button_container container' id='top_button_container'>
+			<p id='title'>Gerard's Blagoblag</p>
+			<button type='button' class='internal' id='about'>About</button>
+			<button type='button' class='internal' id='projects'>Projects</button>
+			<a class='external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		<div class='content_container container' id='top_content_container'>
+			<div class='content' id='about'><p>
+				<h1>About Me</h1>
+				My name is Gerard Geer, and I'm attending the Rochester Institute of Technology aimed for a Bachelor's degree
+				in Computer Science.
+				</p>
+			</div>
+			<div class='content' id='projects'>
+				<div class='button_container container' id='project_button_container'>
+					<button type='button' class='internal' id='map'>3D Map</button>
+					<button type='button' class='internal' id='soap'>SOAP</button>
+					<button type='button' class='internal' id='arcade'>Arcade Interface</button>
+					<button type='button' class='internal' id='genesis'>Sega Genesis Mods</button>
+					<button type='button' class='internal' id='shaders'>Shader Learnings</button>
+					<!--<button type='button' class='internal' id='luma'>LUMA</button>-->
+				</div>
+				<div class='content_container container' id='project_content_container'>
+					<div class='content' id='default_project_text'>
+						<h1>Projects</h1>
+						<p>Welcome to my projects page. Click one of the buttons above to learn more about a specific project.</p>
+					</div>
+					<div class='content' id='map'>
+						<h1>3D Floor Map</h1>
+						<p>WebGL is fun beans. Since it is in essence just a JavaScript object it doesn't have
+						all the idiosyncrasies that traditional OpenGL implementations. There isn't multiple editions
+						of GLSL to contend with, no worries about capabilities between cards and OpenGL revisions, 
+						and no clunkiness in loading shaders and textures. However, to accomplish such a great feat
+						of platform independence it has to dip its capabilities to nearly the least common denominator
+						of hardware.</p>
+						<p>What I've made here is a 3D floor map of my dormitory floor at RIT. You click on a room, and
+						info about that room pops up in a small dialog. Some rooms and other entities have links in their
+						info that take you to relevant information, right there in the map.
+						<h2>Rendering</h2>
+						<p>There are two editions of the map geometry used:
+						<ul>
+							<li>One which is color-coded in greyscale based on the room. This is the ID model.</li>
+							<li>Another which is colored for the user to see. I'll call this the "diffuse" pass.</li>
+						</ul>
+						</p>
+						<p>These two models are rendered multiple times. First, we directly render the ID model to
+						a framebuffer with a yellow background, allowing us to differentiate between clicks that are on
+						and off the model with ease.
+						</p>
+						<p>WebGL does not allow for multiple render targets, so for each pass of a multiple-buffer rendering
+						method must be done independently. This fact causes some friction in the drawing of the model.
+						The final desired product is fully wire-framed, and the wire-frame and selected room are gently
+						Gaussian blurred, giving an old-timey sci-fi look. I was going for (in part) the style that
+						Eidos' cult-classic game Whiplash had with their map display, but with a bit more detail and 
+						interactivity.) To accomplish this the rendering methodology the map uses has several steps. (On
+						part of WebGL's lack of MRT support.)
+						<div class="image_text">		
+							<p>
+							<div class="image">
+							<a href="img/prj/map/full/idPass.png" target="_blank"><img src="img/prj/map/small/idPass.png" alt="Render pass of the ID model" width="400" height="400"></a>
+							</div>
+							Render the ID model into a framebuffer, and store it until later.
+							</p>
+						</div>
+						<div class="image_text">		
+							<p>
+							<div class="image">
+							<a href="img/prj/map/full/diffusePass.png" target="_blank"><img src="img/prj/map/small/diffusePass.png" alt="Render pass of the diffuse model" width="400" height="400"></a>
+							</div>
+							Render the diffuse model into a framebuffer, and store it until later.
+							</p>
+						</div>
+						<div class="image_text">		
+							<p>
+							<div class="image">
+							<a href="img/prj/map/full/normalPass.png" target="_blank"><img src="img/prj/map/small/normalPass.png" alt="Render pass to store surface normals of the model" width="400" height="400"></a>
+							</div>
+							Use GLSL's dFdx() dFdy() functions to render the surface normals of the diffuse 
+							model, into another framebuffer.
+							</p>
+						</div>
+						<div class="image_text">		
+							<p>
+							<div class="image">
+							<a href="img/prj/map/full/depthPass.png" target="_blank"><img src="img/prj/map/small/depthPass.png" alt="Render pass to store the depth values of the model" width="400" height="400"></a>
+							</div>
+							Render the depth of the diffuse model into a framebuffer. Notice now that we have 
+							all of the viewport-visible data of the model in image-space. (Including the earlier 
+							rendering of the ID model.)
+							</p>
+						</div>
+						<div class="image_text">		
+							<p>
+							<div class="image">
+							<a href="img/prj/map/full/wireframePass.png" target="_blank"><img src="img/prj/map/small/wireframePass.png" alt="The creation of the wire-frame" width="400" height="400"></a>
+							</div>
+							Next we apply a Sobel filter to the ID, normal, and depth renders. If the value of any of these 
+							at a given texel is above a certain threshhold, it is stepped up to 1 and stored in its own 
+							framebuffer. This is how the wireframe is created. Also rendered into this buffer is the 
+							selected room, if it exists. When we combine the wireframe with the final pass, the selected 
+							room is highlighted.
+							</p>
+						</div>
+						<div class="image_text">		
+							<p>
+							<div class="image">
+							<a href="img/prj/map/full/normalDrawback.png" target="_blank"><img src="img/prj/map/small/normalDrawback.png" alt="Drawback of using the normal pass to detect edges" width="400" height="400"></a>
+							</div>
+							It is important to note that certain edges are not visible in either the ID, diffuse, 
+							or normal passes. To detect these edges, we must also use the depth pass when generating the wireframe.
+							</p>
+						</div>
+						<div class="image_text">		
+							<p>
+							<div class="image">
+							<a href="img/prj/map/full/blurPass.png" target="_blank"><img src="img/prj/map/small/blurPass.png" alt="Blurring the wire-frame" width="400" height="400"></a>
+							</div>
+							Render the wire-frame pass, horizontally Gaussian blurred, into yet another framebuffer, then 
+							Take the horizontally blurred rendering, blur it vertically, and store it into 
+							<i>yet another</i> framebuffer.
+							</p>
+						</div>
+						<div class="image_text">		
+							<p>
+							<div class="image">
+							<a href="img/prj/map/full/compositePass.png" target="_blank"><img src="img/prj/map/small/compositePass.png" alt="The final composited frame" width="400" height="400"></a>
+							</div>
+							Combine the original rendering of the diffuse model with the unadulterated wire-frame pass,
+							and the blurred wire-frame pass. This final addition of buffers is what is displayed to the screen.
+							</p>
+						</div>
+						</p>
+						<p>
+						Yes, there is a whole lot being done here. It can even be further reduced as-is. One might criticize 
+						the fact that normals are calculated in their own pass, when they can simply be derived from the 
+						depth-pass framebuffer. There is a reason for doing it my way: The way  dFdx(genType g) 
+						and dFdy(genType g) work is, well, 'effing cool. Fragments are processed often in 
+						groups, each with their own set of registers with the GPU. These  two functions actually snoop the 
+						registers of adjacent fragments for the state of the variable passed to them, and returns the difference 
+						between the local and snooped copy of the variable. That's wicked.
+						</p>
+						<h2>Interaction</h2>
+						<p>
+						Compared to the rendering of the map, interaction is rather straightforward. The user clicks somewhere on
+						the screen. The location of the click is taken and transformed by the view-frustum of the ID pass, and
+						then the transformed coordinates are used to read directly out of the ID pass framebuffer. Since the
+						background in this pass is yellow, we know that if the values of the red and blue channels don't match,
+						the user clicked outside the model. If they do, we send the red value to the info-popup dialog callback
+						as the ID of the room to display.
+						</p>
+						<p>Info for the room is queried from an LDAP database maintained by members of the dormitory floor.</p>
+						</p>
+					</div>
+					<div class='content' id='soap'>
+						<h1>SOAP<br> (Shower Oriented Audio Player)</h1>
+						<p>One of my favorite perks of being a CSH member was the version of SOAP that existed
+						when I was a freshmen. Sadly, that setup was actually very poor in design--both in software
+						and hardware design. For Pete's sake, each amplifier was split between two bathrooms.</p>
+						<p>As time has passed that system has fallen into complete disarray and only the speakers
+						remain. Nobody has been able to shower with tunes since late 2012.</p>
+						<p>Flash forward to a lonely weekend during December 2013, I found myself deciding to learn
+						Node.js, and wanted to have a starter project to get me up to speed. It hit me pretty quickly
+						that I should remake SOAP.</p>
+						<p>One of the main issues with the original SOAP was that to start audio you had to submit
+						a URL to the projects web interface. During busy shower hours the time between checking
+						to see if a shower was available and returning to one's room to select a song would often
+						leave oneself shower-sniped. The shower would be taken while setting up SOAP. It was
+						infuriating.</p>
+						<p>Another problem was that you could only specify a single song, and most desirable songs
+						are shorter than most desirable showers. The first 5 minutes of a shower would be melodious
+						and enjoyable, but any point beyond would be filled only with the lonely sound of water running
+						down the drain.</p>
+						<p>These two shortcomings and the potential to fix them drove me through my Node.JS text, and on
+						to create a working recreation of SOAP.</p>
+						<p>My solution focused around the plan to provide each bathroom with an independent client machine
+						that would query a database of playlists--playlists edited through a centralized web server.</p>
+						<p>The client is quite tidy. It waits for user authentification, and upon receiving it, pulls
+						the user's playlist from the database. That playlist is then poured into a worker thread that
+						iterates through it and plays each.</p>
+						<p>The server is simple as well. It serves the content and features of a simplified webpage that
+						includes--among other things--a text area which is used to display and edit the current 
+						user's playlist. When the text area is submitted it is parsed and stored into the database keyed
+						to the user's id.</p>
+						<p>The database is Redis, configured to be more persistent than average, and stores each playlist
+						simply a list.</p>
+					</div>
+					<div class='content' id='arcade'>
+							<h1>Arcade Interface</h1>
+							<p>On RIT's Computer Science House there is an arcade machine built by some bros that currently is a multi-game cabinet.
+							The prior interface to select a game was rather lackluster, so I decided to have a go at redesigning it.
+							Previously games were merely an alphabetized list of names that the user scrolled through. While effective, it didn't
+							frame the games in the cabinet in any sort of enticing light. Put simply, it wasn't very graphical.</p>
+							<p>My interface sets out to change that.</p>
+							<p>The new UI is centered around a tile-based selection mechanic. Each tile has four neighbor slots, which can point to
+							any other tile in the tile grid (or no tile, for that matter). Beyond that, the interface can store multiple grids of tiles
+							that can be easily switched between.</p>
+							<p>The tiles each store three screenshots, one to display on the tile when it is not currently highlighted, one to 
+							display when it is, and one to display in the background of the	UI when the tile is highlighted.</p>
+							<div class="image_text">		
+								<p>
+								<div class="image">
+								<a href="img/prj/arcadeui/full/gsh.png" target="_blank"><img src="img/prj/arcadeui/small/gsh.png" alt="Arcade UI Gunstar Heroes highlighted" width="298" height="238"></a>
+								<a href="img/prj/arcadeui/full/sor2.png" target="_blank"><img src="img/prj/arcadeui/small/sor2.png" alt="Arcade UI Streets of Rage 2 highlighted" width="298" height="238"></a>
+								</div>
+								Notice the different images displayed in the background and on the tiles in these two screenshots.
+								</p>
+							</div>
+							<p>
+							The UI works by making system() calls to the OS; each tile has a command that is executed when it is selected. This allows for maximum
+							versatility. Any program can be assigned to a tile--games running in Kega Fusion to others that are running natively on the machine can
+							be represented in the UI. They merely have to be able to be exited with the cabinet's controls.</p>
+							<p>Each tile is highly configurable. Besides their neighbor relationships, their positions, images, and sizes can be 
+							configured. Besides that, the fact that they can have frames is also user-defined. Tiles can also be specified to not be selectable.</p>
+							<p>The interface itself has many properties that can be tailored as well. The BGM track, sound effects, and their volumes are 
+							all adjustable, as are the frame sreenshot, the time taken between frames, the shutdown time, and many other parameters. You can even
+							specify your own shaders if necessary.</p>
+							<div class="image_text">		
+								<p>
+								<div class="image">
+								<a href="img/prj/arcadeui/full/uiconfig.png" target="_blank"><img src="img/prj/arcadeui/small/uiconfig.png" alt="UI Config" width="298" height="238"></a>
+								<a href="img/prj/arcadeui/full/tileconfig.png" target="_blank"><img src="img/prj/arcadeui/small/tileconfig.png" alt="Tile Config" width="298" height="238"></a>
+								</div>
+								Screens showing the properties of the tiles and editor that are user-defined.
+								</p>
+							</div>
+							<div class="image_text">		
+								<p>
+								<div class="image">
+								<a href="img/prj/arcadeui/full/editor.png" target="_blank"><img src="img/prj/arcadeui/small/editor.png" alt="Tile editor" width="600" height="480"></a>
+								</div>
+								An editor is available to create tile configurations.
+								</p>
+							</div>
+							<h1>Action Video</h1>
+							<div class="image_text">		
+								<p>
+								<div class="video">
+								<iframe width="480" height="360" src="https://www.youtube.com/embed/6NWu2vIvqNU" frameborder="0" allowfullscreen></iframe>
+								</div>
+								A short video captured in Fraps that shows the general operation of the UI. Note that grids are switched between, but as a lazy oversight,
+								they all contain the same games.
+								</p>
+							</div>
+					</div>
+					<div class='content' id='genesis'>
+						<h1>VA-4 Model II Sega Genesis</h1>
+						<p>During the Christmas of 1997 my grandparents bought me a model II Sega Genesis. 
+						Unlike my father's NES, this console was actually mine, and as long as I knew that 
+						it wasn't just a toy--and could electrocute me--I was free to mess about with it however I 
+						wanted. For the entire portion of my youth that I used the system afresh, I never
+						used it, even thought about it in such a way that was out of accordance with the
+						manual.</p>
+						<p>Jumping ahead to my first term at RIT, I had my Genesis and many, many games shipped
+						to my dorm. A floormate and decent friend took note and rather forcfully suggested that we
+						modify the console as to bypass the composite video encoder and output pure RGB video, greatly
+						improving video quality. And so he did, tearing apart the precious gift that was so
+						special to me over the years, soldered to it, and re-assembled it with a new hole in
+						the back and a new port. This was the first of many additions to the console.</p>
+						<p>The next modification to it was to add a 3.5mm stereo audio jack so that we wouldn't
+						need to use the original video cables for sound. So I took a female connector and
+						soldered it to the breakout of the AV port. Simple stuff.</p>
+						<p>A few months later the same floormate and I found a very large and very good CRT Television
+						abandoned in a garbage pile. The LHF/UHF tuner was broken(or something), but it still
+						displayed data just fine. So while my friend was busy modifying it to recieve pure RGB
+						input, I soldered a female S-Video port to the same AV breakout (The Sega proprietary AV port has a
+						lot of pins for a lot of things) and we were off to the races yet again.</p>
+						<p>By far the most interesting addition, however, was the bank of switches on the side.
+						After soldering switches to the 50/60Hz and PAL/NTSC jumpers, I looked about an inch
+						to the left and noticed that there were several more jumpers. And even more above.
+						I put the console back together to test the first two switches, then I took it partially
+						back apart to mess with those jumpers. I haven't the slightest idea Sega would have left
+						these on the board. One prevents the VDP from writing out to the encoder, leaving either
+						just the border color or stripes of two palette entries, and another occasionally crashes
+						the console(likely my fault). But two others seem to work together to prevent IO operations
+						to VRAM. This means that one can: 
+								<ul>
+									<li>load a game</li>
+									<li>Engage the jumpers</li>
+									<li>Swap out the cartridge</li>
+									<li>[Rapidly] reset the console</li>
+									<li>Start the other game</li>
+									<li>Disengage the jumpers</li>
+									<li>Play the current game with whatever was left in 
+									VRAM by the other game, and hasn't yet been replaced.</li>
+								</ul>
+						Down below are some photos of the console, and this very process.
+						</p>
+						
+						<h2>Photos</h2>
+						
+						<div class="image_text">		
+						<p>
+						<div class="image">
+						<a href="img/prj/genny/full/top.jpg" target="_blank"><img src="img/prj/genny/small/top.jpg" alt="Genesis Top" width="594" height="337"></a>
+						</div>
+						The top of my console. A keen eye will notice that the LED is a tad strange,
+						a less keen eye will notice that the region tabs have been gnawed off of the 
+						cartridge slot, and a not-so-keen eye will notice that the hardware stickers 
+						from my old laptop ended up on the console's backside.
+						</p>
+						</div>
+						
+						<div class="image_text">		
+						<p>
+						<div class="image">
+						<a href="img/prj/genny/full/backfin.jpg" target="_blank"><img src="img/prj/genny/small/backfin.jpg" alt="Genesis Back" width="594" height="337"></a>
+						</div>
+						The back of the console. From left to right one sees the 15-pin VGA connector that spits out our RGB signal, 
+						the fancy looking new audio out, the two original ports, the NTSC/PAL switch, the refresh-rate switch, and
+						the S-VIDEO port. Yes, the RGB port is the same type of connector that older graphics cards and computers have. This
+						will work with any monitor that supports the sync-frequency of the Genesis' VDP. Apparently the rate on this Genny is not
+						as stable as one would like; when one tries to get the SyncMaster(seen below) to adjust to this signal,
+						we get some strange, strange column-centric ghosting, pointing to an inconsistency in pixel phase and 
+						single pixel generation rate. On my friend's Model I Genesis, there is no such problem.
+						</p>
+						</div>
+						
+						<div class="image_text">		
+						<p>
+						<div class="image">
+						<a href="img/prj/genny/full/side.jpg" target="_blank"><img src="img/prj/genny/small/side.jpg" alt="Genesis Side" width="594" height="337"></a>
+						</div>
+						Here we see the DIP bank that I used to play with all the mysterious jumpers. It was torn off some old discarded PCB
+						that was laying around. Switches 9 and 10 are the magic two that do the funky with the VRAM, 8 has no effect, and 
+						7, 6, and 5 mess with VDP output. The others don't seem to do anything but on the rarest of occasions freeze
+						the system.
+						</p>
+						</div>
+						
+						<div class="image_text">		
+						<p>
+						<div class="image">
+						<a href="img/prj/genny/full/motherboardfin.jpg" target="_blank"><img src="img/prj/genny/small/motherboardfin.jpg" alt="Genesis Mobo" width="594" height="337"></a>
+						</div>
+						Taking the top off the Genesis we see some of the handywork done inside. In box A we see the working of my friend's
+						RGB modification: sapping from behind the composite encoder, being resisted for correct brightness, and going out to the 
+						VGA port.
+						</p>
+						<p>
+						In box B we see some of the jumpers that are accessed. These connect to switches 3 and 4. They aren't special.
+						</p>
+						<p>
+						Hiding in box C we find the majority of the jumpers. Towards the bottom of this mess are the two that affect
+						VRAM IO, and above are the other ones that affect video. These are switches 5 through 10.
+						</p>
+						<p>
+						In the next two boxes is the connection to the jumper that controls refresh rate and the region respectively.
+						</p>
+						<p>
+						Finally in box E we see the removal of the original evil red LED and its replacement: a very, very bright green LED.
+						The original 1.5 volts or so that the original LED took didn't power the new LED, so now it sits on a chunk
+						of perf board and is powered directly from the little votage regulator on the left of the motherboard, and
+						a opto-isolator connected to the original LED location switches the LED when necessary. The assembly is too tall
+						to fit under the original LED diffuser, so one made of hot glue (almost identical in translucency!) does the job instead.
+						</p>
+						<p>
+						If it isn't strong enough to use as a frisbee, it's not good enough. That's why everything is reinforced with copious
+						amounts of hot glue.
+						</p>
+						</div>
+						
+						<div class="image_text">		
+						<p>
+						<div class="image">
+						<a href="img/prj/genny/full/sor3far.jpg" target="_blank"><img src="img/prj/genny/small/sor3far.jpg" alt="SORIII Near" width="594" height="337"></a>
+						</div>
+						Streets of Rage III running on a SyncMaster 940Be monitor.
+						</p>
+						</div>
+						
+						<div class="image_text">		
+						<p>
+						<div class="image">
+						<a href="img/prj/genny/full/sor3near.jpg" target="_blank"><img src="img/prj/genny/small/sor3near.jpg" alt="SORIII Far" width="594" height="337"></a>
+						</div>
+						Close up shot for a bit more color accuracy.
+						</p>
+						</div>
+						
+						<div class="image_text">		
+						<p>
+						<div class="image">
+						<a href="img/prj/genny/full/garbled.jpg" target="_blank"><img src="img/prj/genny/small/garbled.jpg" alt="Garbled Mess" width="594" height="337"></a>
+						</div>
+						This is what happens when you engage the VRAM IO jumpers. It's crazy.
+						</p>
+						</div>
+						
+						<div class="image_text">		
+						<p>
+						<div class="image">
+						<a href="img/prj/genny/full/sksor3far.jpg" target="_blank"><img src="img/prj/genny/small/sksor3far.jpg" alt="SOR3 and S&K Combined" width="594" height="337"></a>
+						</div>
+						Here I've swapped Streets of Rage III with Sonic and Knuckles without dis-engaging 
+						the jumpers until getting in game.
+						</p>
+						</div>
+						
+						<div class="image_text">		
+						<p>
+						<div class="image">
+						<a href="img/prj/genny/full/sksor3near.jpg" target="_blank"><img src="img/prj/genny/small/sksor3near.jpg" alt="SOR3 and S&K Combined close-up" width="594" height="337"></a>
+						</div>
+						Close up. Notice that you can still see the font tiles of Streets III, as well as several 
+						intact background elements. The rest is garbled since S&K doesn't store its tiles in the
+						same order as SOR III, nor with the same palettes. Sonic's animations are loaded from RAM whenever needed, so
+						they aren't affected by this hack.
+						</p>
+						</div>
+					</div>
+					<div class='content' id='shaders'>
+						<h1>Fun with Ray-Marching</h1>
+						<p>I've always been fascinated with ray-tracing and its cousins. I've always
+						been intriqued by its reputation of elegance and simplicity, but stymied by
+						the math that most whitepapers lead off with, and the tedium of setting up a
+						project far enough as to actually be able to do some drawing.</p>
+						<p>Recently though I stumbled upon a website called Shadertoy, which provides
+						users a WebGL fragment shader with several common and useful uniform variables
+						already defined and provided. Some textures and cubemaps are provided as well!</p>
+						<p>At this point I decided in a moment of fortitude that I should go ahead and
+						learn a fair bit.</p>
+						<p>Specifically speaking I focused on ray-casting, a less analytic approach
+						to casting rays. While working with this I learned several lighting techniques,
+						such as creating distance functions, lighting, shadowing, and ambient occlusion.
+						I'll outline some of what I've learned here.</p>
+						<h2>Distance Functions and the Basis of Ray Marching</h2>
+						<p>At the root of ray-marching is something called the <i>distance function.</i>
+						It turns your geometry into a scalar field, where for any position in space
+						you can query it for the distance to the nearest point on the surface of your
+						scene.</p>
+						<p>A ray begins its life thrust through a pixel from the view origin. Once it
+						enters, the scene, however, its life is dominated by the distance function.
+						The ray is marched along its direction by the distance to the nearest object,
+						until that distance falls below a minimum. At that point, we assume that the
+						ray has arrived at a surface. The position of that ray is then interpreted as
+						the location of a surface as seen through that pixel.</p>
+						<h2>Normal Derivation</h2>
+						<p>Deriving the surface normal of a surface is moderately expensive, but very
+						straight forward. The direction a surface is facing can be understood from the
+						rate of change of that surface's position.</p>
+						<p>Therefore, if we take the difference in the position from a generally marched
+						ray and three others moved slightly along each axis, we will be left with the
+						surface normal.</p>
+						<h2>Lighting</h2>
+						<p>Now that we have the position and normal vector of a surface available to us,
+						it is possible to do some sort of per-fragment lighting. I've kept it tidy by using
+						the Blinn-Phong model.</p>
+						<p>Blinn-Phong lighting simply put is: ambient + diffuse + specular lighting = Phong Model.</p>
+						<p>The ambient term is just a constant color that is considered to exist omnipresently
+						in the scene.</p>
+						<p>The diffuse term is the color of the material multiplied with the color of the light,
+						further modulated by the cosine of the angle between the incident light vector and
+						the surface normal.</p>
+						<p>The specular highlight is a tad more complex. First we must reflect the incident view
+						vector across the surface normal to get a reflection vector. We then take the cosine
+						of the reflection vector and the incident light vector, and raise it to a specularity
+						power. This term is merely the color of the light, as it's a reflection of the light
+						itself.</p>
+						<p></p>
+					</div>
+					<div class='content' id='luma'>what is this here for</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

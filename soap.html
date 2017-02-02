@@ -1,0 +1,67 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Projects | S.O.A.P.</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+	<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the real content of the page. -->
+		<div class='content_container container' id='top_content_container'>
+			<div class='content'>
+				<h1>SOAP<br> (Shower Oriented Audio Player)</h1>
+				<p>One of my favorite perks of being a CSH member was the version of SOAP that existed
+				when I was a freshman. Sadly, that setup was actually very poor in design--both in software
+				and hardware design. For Pete's sake, each amplifier was split between two bathrooms.</p>
+				<p>As time has passed that system has fallen into complete disarray and only the speakers
+				remain. Nobody has been able to shower with tunes since late 2012.</p>
+				<p>Flash forward to a lonely weekend during December 2013, I found myself deciding to learn
+				Node.js, and wanted to have a starter project to get me up to speed. It hit me pretty quickly
+				that I should remake SOAP.</p>
+				<p>One of the main issues with the original SOAP was that to start audio you had to submit
+				a URL to the projects web interface. During busy shower hours the time between checking
+				to see if a shower was available and returning to one's room to select a song would often
+				leave oneself shower-sniped. The shower would be taken while setting up SOAP. It was
+				infuriating.</p>
+				<p>Another problem was that you could only specify a single song, and most desirable songs
+				are shorter than most desirable showers. The first 5 minutes of a shower would be melodious
+				and enjoyable, but any point beyond would be filled only with the lonely sound of water running
+				down the drain.</p>
+				<p>These two shortcomings and the potential to fix them drove me through my Node.JS text, and on
+				to create a working recreation of SOAP.</p>
+				<p>My solution focused around the plan to provide each bathroom with an independent client machine
+				that would query a database of playlists--playlists edited through a centralized web server.</p>
+				<p>The client is quite tidy. It waits for user authentification, and upon receiving it, pulls
+				the user's playlist from the database. That playlist is then poured into a worker thread that
+				iterates through it and plays each.</p>
+				<p>The server is simple as well. It serves the content and features of a simplified webpage that
+				includes--among other things--a text area which is used to display and edit the current 
+				user's playlist. When the text area is submitted it is parsed and stored into the database keyed
+				to the user's id.</p>
+				<p>The database is Redis, configured to be more persistent than average, and stores each playlist
+				simply a list.</p>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

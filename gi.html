@@ -1,0 +1,179 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Articles | Global Illumination</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+	<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the real content of the page. -->
+		<div class='content_container container' id='top_content_container'>
+			<div class='content'>
+				<h1>Global Illumination Using 3D Textures</h1>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/gi/full/base_screen.png' target='_blank'>
+						<img src='img/prj/gi/small/base_screen.png' alt='Screenshot' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						A scene with a lot of cubes using this G.I. technique.
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/gi/full/no_gi.png' target='_blank'>
+						<img src='img/prj/gi/small/no_gi.png' alt='Screenshot' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						The same scene without global illumination.
+						</div>
+					</p>
+				</div>
+				<p>Let's say you have a ray-marched scene and you want to spice it up with some
+				global illumination. What's the first approach you come up with? Perhaps something
+				like this:
+				<ul>
+				<li>Cast several rays distributed evenly throughout a hemisphere above the surface.</li>
+				<li>See if they strike a surface, and if they do, note what color and how strongly
+				illuminated it is, as well as how distant.</li>
+				<li>For each of the rays, consider their contribution to the global illumination
+				to be something like <i>color*brightness*distance<sup>2</sup></i>.</li>
+				<li>Sum those contributions and add the color and brightness to the final
+				color of the surface/pixel.</li>
+				</ul>
+				Straightforward, simple to implement, and computationally complex as hell. You have
+				to cast <i>n<sub>1</sub></i> rays, which take <i>n<sub>2</sub></i> marches and each 
+				surface point might even take <i>n<sub>3</sub></i> steps to shade and determine color</p>
+				<p>Additionally, if surfaces have high frequency and high contrast textures, then
+				having simply stochiastic samples will not provide reliable results. Some rays cast through
+				the hemisphere might land in a dark region on an otherwise green hypothetical object. This ray would
+				report that the object was black and not re-emissing any light, though in reality
+				it was casting a gentle green. When rays are strictly stochiastic frame by frame,
+				this can create some slightly noticable and highly irritating flickering. So we
+				have to add another <i>n<sub>4</sub></i> to account for multi-frame averaging or
+				a Gaussian blur to fix this artifacting. That leaves us with an <i>O(n)</i> of <i>n<sup>4</sup></i>--
+				much too slow for real time.</p>
+				
+				<h2>My Rough-and-Ready Approach</h2>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/gi/full/gi_only.png' target='_blank'>
+						<img src='img/prj/gi/small/gi_only.png' alt='Screenshot' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						The same scene but with the global illumination alone. The rough pixelation is
+						due to having only few samples More samples would smooth things out.
+						</div>
+					</p>
+				</div>
+				<p>Does my technique find a way to optimize around all of this? Not really. It rather
+				is able to sidestep everything by nature of the distance field and the way it is textured.</p>
+				<p>The scene, as you can see, consists of many cubes placed aligned to a grid.
+				This provides us with some assumptions we can leverage. First off, any cube above a surface
+				that may contribute meaningful amounts of secondary illumination will be in a neighboring
+				voxel. If we sample one unit away in any direction, we will be in that neighboring voxel.
+				Secondly, the color of the cube within a voxel is defined in 3D space, and is 
+				defined <i>and homogeneous</i>for the entire voxel, not just at the surface of the cube. 
+				This means we can sample well within or above a cube and still get an accurate result.</p>
+				<p>Using these two realities, we can, instead of marching each ray through the hemisphere,
+				can simply waltz forward by 1 unit and sample existence and color.</p>
+				<p>What isn't well defined throughout the voxel is the magnitude of primary illumination.
+				Therefore we assume a blanket value for the brightness of each contribution.</p>
+				
+				<h2>The Algorithm</h2>
+				
+				<p>This is pretty straightforward, so I'll just leave some code here. Essentially we use
+				Rodrigue's rotation formula to rotate a vector around the surface normal creating a
+				field of samples along a unit hemisphere. These samples are averaged and returned.</p>
+				<div class='code_snippet'>
+				/*<br>
+				&nbsp;&nbsp;Olinde Rodrigues' vector rotation formula for rotating a vector <i>a</i><br>
+				&nbsp;&nbsp;around a vector <i>b</i> <i>t</i> radians.<br>
+				*/<br>
+				vec3 rodRot( in vec3 a, in vec3 b, in float t )<br>
+				{<br>
+				&nbsp;&nbsp;// Straight from wikipedia.<br>
+				&nbsp;&nbsp;return normalize(a*cos(t) + cross(b, a)*sin(t) + b*dot(b,a)*(1.0-cos(t)));<br>
+				}<br>
+				/*<br>
+				&nbsp;&nbsp;Marches about a dome above a surface, sampling the texture at each<br>
+				&nbsp;&nbsp;interval. These samples are weighted based on distance from the original<br>
+				&nbsp;&nbsp;point, summed, averaged, and returned.<br>
+				*/<br>
+				vec3 giColor(in vec3 p, in vec3 n)<br>
+				{<br>
+				&nbsp;&nbsp;// Basically what we're doing here is getting the texture of several<br>
+				&nbsp;&nbsp;// positions above the surface. (Note that the texture color is defined<br>
+				&nbsp;&nbsp;// per voxel, not per surface point. That is the only reason this works.)<br>
+				&nbsp;&nbsp;//<br>
+				&nbsp;&nbsp;// To do that we're going to rotate the surface normal off-axis,<br>
+				&nbsp;&nbsp;// and then Rodrigues' rotate it around the original normal, sampling<br>
+				&nbsp;&nbsp;// as we go. This creates sort of a unit hemisphere above the surface.<br>
+				&nbsp;&nbsp;// Is sampling only at the unit distance a robust plan? Nope. Does it<br>
+				&nbsp;&nbsp;// provide plausible results? Yep.<br>
+				
+				&nbsp;&nbsp;// The vector that is rotated around the vector.<br>
+				&nbsp;&nbsp;vec3 r = vec3(0.0);<br>
+				&nbsp;&nbsp;// A place to accumulate the GI contributions.<br>
+				&nbsp;&nbsp;vec3 gi = vec3(0.0);<br>
+				&nbsp;&nbsp;// A vector tangent to the surface. A vector crossed with a vector that<br>
+				&nbsp;&nbsp;// is not that vector results in a vector tangent to both.<br>
+				&nbsp;&nbsp;vec3 t = normalize(cross(n, n+n.zxy));<br>
+				<br>
+				&nbsp;&nbsp;// So here we get orbit height and radius, leaning the normal over<br>
+				&nbsp;&nbsp;// progressively farther. Here we lean up to 4PI/10, because if we<br>
+				&nbsp;&nbsp;// lean over to PI/2, we get some nasty artifacting since we are sliding<br>
+				&nbsp;&nbsp;// along the surface.<br>
+				&nbsp;&nbsp;for(float a = .0; a < 1.25664; a += .125664)<br>
+				&nbsp;&nbsp;{<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;// Lean over the surface normal by rotating it around<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;// a vector that is orthogonal to it.<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;// Jenny are you okay Jenny?<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;r = rodRot(n, t, a);<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;// March around that orbit.<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;for(float b = 0.0; b < 6.2832; b += 1.25664)<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Mix it with the environment map based on the distance<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// to the other surface at that point.<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gi += mix(color(p+r), vec3(0.0), clamp(pow(dist(p+r),2.0), 0.0, 1.0) );<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Going through the extra effort to consider distance showed<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// very little effect.<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//gi += color(p+r);<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r = rodRot(r, n, 1.25664);<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+				&nbsp;&nbsp;}<br>
+				&nbsp;&nbsp;return gi;<br>
+				}<br>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

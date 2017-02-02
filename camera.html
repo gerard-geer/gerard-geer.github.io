@@ -1,0 +1,151 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Articles | Simple Camera</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+	<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the real content of the page. -->
+		<div class='content_container container' id='top_content_container'>
+			<div class='content'>
+				<h1>A Simple Ray-Marching Camera Function</h1>
+				<p>When I first started ray-marching something I found right
+				away was TekF's <a href='https://www.shadertoy.com/view/XdsGDB'>polar camera.</a> It's
+				 elegant, very good at shooting scenes where the camera
+				need not move, and had a parametrization that, while hefty, 
+				made sense.</p>
+				<p>However, as time went on I started feeling like the TekF
+				solution was a bit too much for my needs; I just wanted a
+				camera function that needs and does as little as possible to
+				give me a ray origin and direction.</p>
+				<p>The answer I came up with is based around the classic pinhole
+				camera where the ray origin is at some focal distance<i>f</i> 
+				behind the screen, and the ray direction is just the
+				pixel's position at the screen <i>(u, v, 0)</i> minus the ray 
+				origin, normalized. But let's think: That approach relies heavily on
+				the <i>standard</i> coordinate system; you know, the 3-dimensional
+				space based around x, y and z.
+				Now what if we were to define the origin and direction in such a way
+				that to translate and rotate the camera, we only need to specify our 
+				own vectors as the axes of the three dimensions?</p>
+				<p>In linear algebra, this is essentially a change of basis, with
+				some translation encoded in there too. To start, let's think of 
+				what the camera would consider to be its principle axes:
+				<ul>
+					<li>A vector that points up out of the camera would be its Y-axis.</li>
+					<li>The camera direction--or rather the direction the camera faces--
+					inherently points along the camera-relative Z-axis.</li>
+					<li>The cross product of the camera direction and the UP vector
+					would point orthogonally to the right of the camera, becoming
+					an implicit X-axis in the process.</li>
+				</ul></p>
+				<p>Remember that the original UV coordinates and the distance the
+				focal point is stepped back from the screen are simply multiples of
+				the standard X, Y, and Z basis vectors. Now should we re-imagine our 
+				coordinate basis for the camera, if we think of these things in
+				terms of our new basis vectors, we implicitly perform camera 
+				translation and orientation.</p>
+				<p>Recall the ray origin of the standard pinhole camera to be <i>(0, 0, -f)</i>,
+				and that the original pixel coordinates were <i>(u, v, 0)</i>. A way
+				of thinking about this is:</p>
+				<!-- image of original equation -->
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/camera/full/standardbasiscoord.png' target='_blank'>
+						<img src='img/prj/camera/small/standardbasiscoord.png' alt='Standard basis equation' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Where x, y, and z are vectors representing the standard 
+						axial directions: <i>(1, 0, 0), (0, 1, 0),</i> and <i>(0, 0, 1)</i>.
+						</div>
+					</p>
+				</div>
+				<p>Now that 3-D coordinate right there is essentially the origin
+				of the camera, so:</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/camera/full/standardbasisorigin.png' target='_blank'>
+						<img src='img/prj/camera/small/standardbasisorigin.png' alt='Standard basis equation rewritten' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Yep kids, that point behind the screen is actually the origin of
+						the vector space the rays exist in.
+						</div>
+					</p>
+				</div>
+				<p>Really though, being the camera / ray origin makes it the camera
+				position.</p>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/camera/full/standardbasisposition.png' target='_blank'>
+						<img src='img/prj/camera/small/standardbasisposition.png' alt='Standard basis equation rewritten ... again' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Okay, so that really means it's the camera position.
+						</div>
+					</p>
+				</div>
+				<p>Now let's go ahead and rewrite this equation in terms of our new
+				basis vectors:</p>
+				<!-- image of the new definition -->
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/camera/full/redefinedbasis.png' target='_blank'>
+						<img src='img/prj/camera/small/redefinedbasis.png' alt='Screenshot' width='600'>
+					</a>
+					</div>
+						<div class='image_text'>
+						Note how x, y, and z have been replaced.
+						</div>
+					</p>
+				</div>
+				<p>It's as simple as that.To get the ray direction, you simply normalize 
+				the subtraction of the ray origin
+				from the pixel position, and the ray origin is simply the camera position.</p>
+				<p>And with that you have a pinhole camera that you can easily position,
+				in what can be reduced to two lines of GLSL:</p>
+				<div class='code_snippet'>
+					<p>
+					/*<br>
+					&nbsp;&nbsp;A change-of-basis pinhole camera.<br>
+					*/<br>
+					void camera(in vec2 uv, in vec3 cp, in vec3 cd, in float f, out vec3 ro, out vec3 rd)<br>
+					{<br>
+					&nbsp;&nbsp;ro = cp;<br>
+					&nbsp;&nbsp;normalize((cp + cd*f + cross(cd, UP)*uv.x + UP*uv.y)-ro);<br>
+					}<br>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

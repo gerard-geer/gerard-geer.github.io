@@ -1,0 +1,177 @@
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='css/index.css'>
+	<link rel='stylesheet' type='text/css' href='css/projects.css'>
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript' src='js/navbar.js'></script>
+	<script type='text/javascript' src='js/main.js'></script>
+	<title>Projects | Floormap</title>
+	<meta name='viewport' content='width=700'>
+</head>
+<body onload='init()'>
+<!-- Centers the content horizontally. -->
+	<div id='horizontal_centerer'>
+		<!-- Contains the header text and a bunch of navigation buttons. -->
+		<div class='button_container container' id='top_button_container'>
+			<!-- Title Text -->
+			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+			<!-- Navigation links -->
+			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
+            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
+			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
+			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
+			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
+			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
+			<!-- Animated canvas for style. -->
+			<canvas id='nav_canvas' width='650' height='20'></canvas>
+		</div>
+		
+		<!-- Contains the content on the page. -->
+		<div class='content_container container' id='project_content_container'>
+			<!-- The actual content. -->
+			<div class='content'>
+				<h1>3D Floor Map</h1>
+				<p>WebGL is fun beans. Since it is in essence just a JavaScript object it doesn't have
+				all the idiosyncrasies that traditional OpenGL implementations. There aren't multiple editions
+				of GLSL to contend with, relaxed worries about capabilities between cards and OpenGL revisions, 
+				and stifled clunkiness in loading shaders and textures. However, to accomplish such a great feat
+				of platform independence it has to dip its capabilities to nearly the least common denominator
+				of hardware. (and impose limitations that greatly affect this project, as spoken of later.)</p>
+				<p>What I've made here is a 3D floor map of my dormitory floor at RIT. You click on a room, and
+				info about that room pops up in a small dialog. Some rooms and other entities have links in their
+				info that take you to relevant information, right there in the map.
+				<h2>Rendering</h2>
+				<p>There are two editions of the map geometry used:
+				<ul>
+					<li>One which is color-coded in greyscale based on the room. This is the ID model.</li>
+					<li>Another which is colored for the user to see. I'll call this the "diffuse" pass.</li>
+				</ul>
+				</p>
+				<p>These two models are rendered multiple times. First, we directly render the ID model to
+				a framebuffer with a yellow background, allowing us to differentiate between clicks that are on
+				and off the model with ease.
+				</p>
+				<p>WebGL does not allow for multiple render targets, so for each pass of a multiple-buffer rendering
+				method must be done independently. This fact causes some friction in the drawing of the model.
+				The final desired product is fully wire-framed, and the wire-frame and selected room are gently
+				Gaussian blurred, giving an old-timey sci-fi look. I was going for (in part) the style that
+				Eidos' cult-classic game Whiplash had with their map display, but with a bit more detail and 
+				interactivity.) To accomplish this the rendering methodology the map uses has several steps. (On
+				part of WebGL's lack of MRT support.)
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/map/full/idPass.png' target='_blank'><img src='img/prj/map/small/idPass.png' alt='Render pass of the ID model' width='400' height='400'></a>
+					</div>
+						<div class='image_text'>
+						Render the ID model into a framebuffer, and store it until later.
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/map/full/diffusePass.png' target='_blank'><img src='img/prj/map/small/diffusePass.png' alt='Render pass of the diffuse model' width='400' height='400'></a>
+					</div>
+						<div class='image_text'>
+						Render the diffuse model into a framebuffer, and store it until later.
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/map/full/normalPass.png' target='_blank'><img src='img/prj/map/small/normalPass.png' alt='Render pass to store surface normals of the model' width='400' height='400'></a>
+					</div>
+						<div class='image_text'>
+						Use GLSL's dFdx() dFdy() functions to render the surface normals of the diffuse 
+						model, into another framebuffer.
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/map/full/depthPass.png' target='_blank'><img src='img/prj/map/small/depthPass.png' alt='Render pass to store the depth values of the model' width='400' height='400'></a>
+					</div>
+						<div class='image_text'>
+						Render the depth of the diffuse model into a framebuffer. Notice now that we have 
+						all of the viewport-visible data of the model in image-space. (Including the earlier 
+						rendering of the ID model.)
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/map/full/wireframePass.png' target='_blank'><img src='img/prj/map/small/wireframePass.png' alt='The creation of the wire-frame' width='400' height='400'></a>
+					</div>
+						<div class='image_text'>
+						Next we apply a Sobel filter to the ID, normal, and depth renders. If the value of any of these 
+						at a given texel is above a certain threshhold, it is stepped up to 1 and stored in its own 
+						framebuffer. This is how the wireframe is created. Also rendered into this buffer is the 
+						selected room, if it exists. When we combine the wireframe with the final pass, the selected 
+						room is highlighted.
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/map/full/normalDrawback.png' target='_blank'><img src='img/prj/map/small/normalDrawback.png' alt='Drawback of using the normal pass to detect edges' width='400' height='400'></a>
+					</div>
+						<div class='image_text'>
+						It is important to note that certain edges are not visible in either the ID, diffuse, 
+						or normal passes. To detect these edges, we must also use the depth pass when generating the wireframe.
+						</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/map/full/blurPass.png' target='_blank'><img src='img/prj/map/small/blurPass.png' alt='Blurring the wire-frame' width='400' height='400'></a>
+					</div>
+						<div class='image_text'>
+						Render the wire-frame pass, horizontally Gaussian blurred, into yet another framebuffer, then 
+						Take the horizontally blurred rendering, blur it vertically, and store it into 
+						<i>yet another</i> framebuffer.
+					</div>
+					</p>
+				</div>
+				<div class='image_and_text'>		
+					<p>
+					<div class='image'>
+					<a href='img/prj/map/full/compositePass.png' target='_blank'><img src='img/prj/map/small/compositePass.png' alt='The final composited frame' width='400' height='400'></a>
+					</div>
+						<div class='image_text'>
+						Combine the original rendering of the diffuse model with the unadulterated wire-frame pass,
+						and the blurred wire-frame pass. This final addition of buffers is what is displayed to the screen.
+						</div>
+					</p>
+				</div>
+				</p>
+				<p>
+				Yes, there is a whole lot being done here. It can even be further reduced as-is. One might criticize 
+				the fact that normals are calculated in their own pass, when they can simply be derived from the 
+				depth-pass framebuffer. There is a reason for doing it my way: The way  dFdx(genType g) 
+				and dFdy(genType g) work is, well, 'effing cool. Fragments are processed often in 
+				groups, each with their own set of registers with the GPU. These  two functions actually snoop the 
+				registers of adjacent fragments for the state of the variable passed to them, and returns the difference 
+				between the local and snooped copy of the variable. That's wicked.
+				</p>
+				<h2>Interaction</h2>
+				<p>
+				Compared to the rendering of the map, interaction is rather straightforward. The user clicks somewhere on
+				the screen. The location of the click is taken and transformed by the view-frustum of the ID pass, and
+				then the transformed coordinates are used to read directly out of the ID pass framebuffer. Since the
+				background in this pass is yellow, we know that if the values of the red and blue channels don't match,
+				the user clicked outside the model. If they do, we send the red value to the info-popup dialog callback
+				as the ID of the room to display.
+				</p>
+				<p>Info for the room is queried from an LDAP database maintained by members of the dormitory floor.</p>
+				</p>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
