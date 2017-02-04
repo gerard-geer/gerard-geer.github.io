@@ -1,37 +1,77 @@
 body
 {
+	background: #FFE5D2;
 	display: none;
-	font-family: Helvetica;
+	font-family: Palatino;
 	font-size: 1.05em;
-	text-shadow: 1px 1px 2px #eeeeee;
-	color: #333333;
+	text-shadow: .5px .5px 1px #d6c1b1;
+	color: #606060;
 }
 
 h1
 {
-	color: #2295cc;
+	color: #606060;
+	margin: .0em;
+	padding-bottom: .0em;
+	padding-left: .2em;
+	text-align: left;
+}
+
+#sidebar
+{
+	display: inline-block;
+	text-align: right;
+	list-style-type: none;
+	float: left;
+}
+
+#contentbar
+{
+	display: inline-block;
+	float: left;
+	border-left-style: solid;
+	border-left-color: #606060;
+	border-width: .01em;
 }
 
 h2
 {
-	color: #ff7b00;
+	color: #606060;
+	padding-left: .4em;
+	padding-right: 1.8em;
+	margin-bottom: .1em;
+	width: auto;
+	display: inline-block;
+	border-bottom: 1px solid #606060;
+	margin-bottom: .5em;
+	padding-bottom: .1em;
+}
+
+ul#nav_button_list
+{
+	list-style-type: none;
+}
+
+ul#projects_list
+{
+	list-style-type: none;
+}
+
+ul
+{
+	list-style-type: square;
 }
 
 a.nav
 {
 	display: inline-table;
-	background-color: #ffffff;
-	color: #333333;
+	color: #606060;
 	
 	padding: 2px 6px 2px 6px;
 	margin: 2px 4px 2px 4px;
-	font-size: .8pc;
-	
-	border-width: 2px;
-	border-style: outset;
-	border-color: #f0f0f0 #00d4ff #e5e5e5 #ff7b00;
-	border-radius:4px;
-	-moz-border-radius:5px;
+	min-width: 4em;
+	font-size: .8em;
+	text-align: right;
 }
 
 a.nav:link
@@ -46,7 +86,7 @@ a.nav:visited
 a.nav:hover
 {
 	text-decoration:none;
-	box-shadow: 0px 0px 2px #aaaaaa;
+	box-shadow: inset 0px 0px 3px #b0b0b0;
 }
 a.nav:active
 {
@@ -82,12 +122,18 @@ canvas
 {
 	display:block;
 	border: none;
-	color: #2295cc;
+	color: #606060;
 	font-size: 3pc;
 	margin: auto auto auto auto;
 	font-weight: bold;
 	text-decoration: none;
-	padding-bottom: 5px;
+	padding-left: .1em;
+	text-align: left;
+}
+
+#side_title
+{
+	font-weight: bold;
 }
 
 #title:hover
@@ -114,12 +160,14 @@ div.content_container
 div.content
 {
 	text-align: left;
-	padding: 10px 10px 10px 10px;
-	
-	border-left-style: ridge;
-	border-right-style: ridge;
-	border-left-color: #ff7b00;
-	border-right-color: #00d4ff;
-	border-radius: 18px;
-	-moz-border-radius: 25px;
+	padding: 10px 10px 10px 0px;
+	border-top: 1px solid #606060;
+	margin-top: .5em;
+	padding-top: .4em;
+}
+
+.content-para
+{
+	margin-top: .25em;
+	padding-left: .5em;
 }

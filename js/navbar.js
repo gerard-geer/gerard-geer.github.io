@@ -7,14 +7,12 @@ var frameTime = 15;
 var duration = 20;
 
 // The X location of each of the lines. They are subtly offset from each other.
-var x1 = 0;
+var x = 0;
 var x2 = 5;
 var x3 = 10;
 
 // The per-frame delta of the length of the line.
-var lineDrawingDelta1;
-var lineDrawingDelta2;
-var lineDrawingDelta3;
+var lineDrawingDelta;
 
 // The interval used to animate the navigation bar art.
 var interval;
@@ -27,12 +25,11 @@ function initNavbar()
 {
 	// Extract the canvas and get a rendering context.
 	canvas=document.getElementById("nav_canvas");
+	if(canvas === null) return;
 	ctx=canvas.getContext("2d");
 	
 	// Compute the per frame deltas of the animation.
-	lineDrawingDelta1 = ((canvas.width)/duration);
-	lineDrawingDelta2 = ((canvas.width-10)/duration);
-	lineDrawingDelta3 = ((canvas.width-20)/duration);
+	lineDrawingDelta = ((canvas.width)/duration);
 }
 
 // Expands the navbar.
@@ -67,43 +64,27 @@ function retractNavbar(callback)
 // Draws the lines. What do you expect.
 function drawLines()
 {
+	if(!ctx) return;	
 	// Clear the previous frame of animation.
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	
-	//First line.
-	ctx.beginPath();
-	ctx.lineWidth = 2;
-	ctx.strokeStyle = "#ff7b00";
-	ctx.moveTo(0, 5);
-	ctx.lineTo(x1, 5);
-	ctx.stroke();
-
-	//Second line.
+	// Draw the line.
 	ctx.beginPath();
 	ctx.lineWidth = 2;
 	ctx.strokeStyle = "#606060";
-	ctx.moveTo(5, 10);
-	ctx.lineTo(x2, 10);
-	ctx.stroke();
-
-	//Third line.
-	ctx.beginPath();
-	ctx.lineWidth = 2;
-	ctx.strokeStyle = "#00d4ff";
-	ctx.moveTo(10, 15);
-	ctx.lineTo(x3, 15);
+	ctx.moveTo(0, 5);
+	ctx.lineTo(x, 5);
 	ctx.stroke();
 }
 
 // Decrements the lines.
 function decrementLines()
 {
+	if(!ctx) return;	
 	// Increment length values if we haven't yet reached our target length.
-	if(x1>0)
+	if(x>0)
 	{
-		x1 = x1-lineDrawingDelta1;
-		x2 = x2-lineDrawingDelta2;
-		x3 = x3-lineDrawingDelta3;
+		x = x-lineDrawingDelta;
 		return true;
 	}
 	return false;
@@ -111,12 +92,11 @@ function decrementLines()
 
 function incrementLines()
 {
+	if(!ctx) return;	
 	// Increment length values if we haven't yet reached our target length.
-	if(x1<canvas.width)
+	if(x<canvas.width)
 	{
-		x1 = x1+lineDrawingDelta1;
-		x2 = x2+lineDrawingDelta2;
-		x3 = x3+lineDrawingDelta3;
+		x = x+lineDrawingDelta;
 		return true;
 	}
 	return false;
