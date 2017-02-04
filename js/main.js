@@ -38,11 +38,12 @@ function init()
 	internalButtons = [];
 	
 	// Initialize the navbar.
-	initNavbar();
+	//initNavbar();
 	
 	// Fade in the page.
 	$("body").fadeIn(duration*frameTime);
 	
 	// Start the navbar animation, initializing the buttons upon completion.
-	expandNavbar(function(){initButtons();});
+	//expandNavbar(function(){initButtons();});
+	initButtons();
 }
