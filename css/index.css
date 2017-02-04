@@ -4,7 +4,7 @@ body
 	display: none;
 	font-family: Palatino;
 	font-size: 1.05em;
-	text-shadow: .5px .5px 1px #d6c1b1;
+	text-shadow: .5px .5px .5px #d6c1b1;
 	color: #606060;
 }
 
