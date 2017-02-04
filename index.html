@@ -14,27 +14,31 @@
 	<!-- Centers the content horizontally. -->
 	<div id='horizontal_centerer'>
 		<!-- Contains the buttons and navbar canvas. Oh, and the title too. -->
-		<div class='container' id='top_button_container'>
-			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
-			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
-            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
-			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
-			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
-			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
-			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
-			<canvas id='nav_canvas' width='650' height='20'></canvas>
-		</div>
-		<!-- Contains the content. -->
-		<div class='content_container container'>
-		<!-- The actual content. -->
-			<div class='content' id='about'>
-				<p>
-					<h1>About Me</h1>
-					My name is Gerard Geer, and I'm attending the Rochester Institute of Technology aimed for a 
-					Bachelor's degree in Computer Science.
-				</p>
+			<div id='sidebar'>
+				<!-- Navigation links -->
+				<ul id='nav_button_list'>
+					<li><a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a></li>
+					<li><a class='nav internal' href='shaders.html' id='shaders'>Shaders</a></li>
+					<li><a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a></li>
+					<li><a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a></li>
+					<li><a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a></li>
+					<li><a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a></li>
+				</ul>
 			</div>
-		</div>
+			<div id='contentbar'>
+				<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+				<!-- Contains the content. -->
+				<div class='content_container container'>
+				<!-- The actual content. -->
+					<div class='content' id='about'>
+						<h2>About Me</h2>
+						<p class='content-para'>
+							My name is Gerard Geer, and I'm attending the University of Texas at Dallas
+							for a Bachelor's degree in Computer Science.
+						</p>
+					</div>
+				</div>
+			</div>
 	</div>
 </body>
 </html>

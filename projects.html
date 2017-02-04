@@ -9,41 +9,43 @@
 	<meta name='viewport' content='width=700'>
 </head>
 <body onload='init()'>
+	<!-- Centers the main page vertically. -->
+	<div id='vertical_centerer'></div>
 	<!-- Centers the content horizontally. -->
 	<div id='horizontal_centerer'>
-		<!-- Contains the header text and a bunch of navigation buttons. -->
-		<div class='button_container container' id='top_button_container'>
-			<!-- Title Text -->
-			<a class='internal' id='title' href='index.html'>Gerard's Blagoblag</a>
+		<div id='sidebar'>
 			<!-- Navigation links -->
-			<a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a>
-            <a class='nav internal' href='shaders.html' id='shaders'>Shaders</a>
-			<a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a>
-			<a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a>
-			<a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a>
-			<a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a>
-			<!-- Animated canvas for style. -->
-			<canvas id='nav_canvas' width='650' height='20'></canvas>
+			<ul id='nav_button_list'>
+				<a class='nav internal' id='side_title' href='index.html'>Gerard's Blagoblag</a>
+				<li><a class='nav internal' href='projects.html' id='projects'>Projects/Articles</a></li>
+				<li><a class='nav internal' href='shaders.html' id='shaders'>Shaders</a></li>
+				<li><a class='nav external' target='_blank' href='https://www.github.com/gerard-geer' id='github'>Github</a></li>
+				<li><a class='nav external' target='_blank' href='https://www.shadertoy.com/user/hamneggs' id='shadertoy'>Shadertoy</a></li>
+				<li><a class='nav external' target='_blank' href='http://www.openprocessing.org/user/6421' id='openprocessing'>OpenProcessing</a></li>
+				<li><a class='nav external' target='_blank' href='dl/resume.pdf' id='resume'>Resume</a></li>
+			</ul>
 		</div>
-		
-		<!-- Contains the real content of the page. -->
-		<div class='content_container container' id='top_content_container'>
-			<div class='content'>
+		<div id='contentbar'>
+			
+			<!-- Contains the real content of the page. -->
+			<div class='content_container container' id='top_content_container'>
 				<h1>Projects and articles</h1>
-				<p>
+				<div class='content'>
+				<p class='page_desc'>
 					This page hosts write-ups on some things I've done/learned. Click around!
 				</p>
-				<div id='projects'>
-					<a class='nav internal project' href='floormap.html'>3D Floor Map</a>
-					<a class='nav internal project' href='genny.html'>Sega Genesis Modifications</a>
-					<a class='nav internal project' href='soap.html'>Shower Oriented Audio Player</a>
-					<a class='nav internal project' href='arcade.html'>Arcade Interface</a>
-					<a class='nav internal project' href='normals.html'>Fast Surface Normal Generation</a>
-					<a class='nav internal project' href='camera.html'>A (very) Simple Camera System</a>
-					<a class='nav internal project' href='ao.html'>Sampled Ambient Occlusion</a>
-					<a class='nav internal project' href='gi.html'>3D-Texture Global Illumination</a>
-					<a class='nav internal project' href='texturing.html'>3D Texture Mapping</a>
-					<a class='nav internal project' href='bittext.html'>Procedural Bitmap Text</a>
+					<ul id='projects_list'>
+						<li><a class='nav internal project' href='floormap.html'>3D Floor Map</a></li>
+						<li><a class='nav internal project' href='genny.html'>Sega Genesis Modifications</a></li>
+						<li><a class='nav internal project' href='soap.html'>Shower Oriented Audio Player</a></li>
+						<li><a class='nav internal project' href='arcade.html'>Arcade Interface</a></li>
+						<li><a class='nav internal project' href='normals.html'>Fast Surface Normal Generation</a></li>
+						<li><a class='nav internal project' href='camera.html'>A (very) Simple Camera System</a></li>
+						<li><a class='nav internal project' href='ao.html'>Sampled Ambient Occlusion</a></li>
+						<li><a class='nav internal project' href='gi.html'>3D-Texture Global Illumination</a></li>
+						<li><a class='nav internal project' href='texturing.html'>3D Texture Mapping</a></li>
+						<li><a class='nav internal project' href='bittext.html'>Procedural Bitmap Text</a></li>
+					</ul>
 				</div>
 			</div>
 		</div>
