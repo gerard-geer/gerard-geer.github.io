@@ -25,7 +25,7 @@ function initNavbar()
 {
 	// Extract the canvas and get a rendering context.
 	canvas=document.getElementById("nav_canvas");
-	if(!null) return;
+	if(!canvas) return;
 	ctx=canvas.getContext("2d");
 	
 	// Compute the per frame deltas of the animation.
